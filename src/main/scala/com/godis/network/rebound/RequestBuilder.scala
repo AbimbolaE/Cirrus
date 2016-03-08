@@ -24,3 +24,18 @@ case class POSTBuilder[F: JsonWriter](url: String, content: F) extends RequestBu
       .body(implicitly[JsonWriter[F]].write(content).compactPrint)
       .ensureSuccess()
 }
+
+case class PUTBuilder[F: JsonWriter](url: String, content: F) extends RequestBuilder {
+  def apply(webb: Webb) =
+    webb
+      .put(url)
+      .body(implicitly[JsonWriter[F]].write(content).compactPrint)
+      .ensureSuccess()
+}
+
+case class DELETEBuilder(url: String) extends RequestBuilder {
+  def apply(webb: Webb) =
+    webb
+      .delete(url)
+      .ensureSuccess()
+}
