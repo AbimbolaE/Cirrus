@@ -1,46 +1,55 @@
 package com.godis.network.rebound
 
 import com.goebl.david.Webb
-import com.google.gson.Gson
-import org.json.JSONArray
+import spray.json._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}
-import scala.reflect.ClassTag
 import scala.util.Success
 
 object Rebound {
 
-  object GET {
-    def apply[T : Parser](url: String)(implicit ec: ExecutionContext) = {
-      val promise = Promise[T]()
+  def GET[T: JsonReader](url: String)(implicit ec: ExecutionContext = ExecutionContext.global) = {
+    io(GETBuilder(url))
+  }
 
-      Future {
-        val request = Webb.create()
-          .get(url)
-          .ensureSuccess()
+//  def POST[T: JsonReader, F: JsonWriter](url: String, content: F)(implicit ec: ExecutionContext = ExecutionContext.global) = {
+//    io(POSTBuilder(url, content))
+//  }
 
-        val response = request.asString()
+  private def io[T: JsonReader](requestBuilder: RequestBuilder)(implicit ec: ExecutionContext) = {
+    val promise = Promise[T]()
 
-        val body = response.getBody
-        val content = new Gson().fromJson(body, classOf[T])
-        promise.complete(Success(content))
-      } recover {
-        case ex => promise.failure(ex)
-      }
+    Future {
+      val request = requestBuilder(Webb.create())
 
-      promise.future
+      val response = request.asString()
+
+      val body = response.getBody
+
+      val content = body.parseJson.convertTo[T]
+
+      promise.complete(Success(content))
+    } recover {
+      case ex => promise.failure(ex)
     }
+
+    promise.future
   }
 }
 
 object Main extends App {
 
+  import Protocol._
   import Rebound._
 
-  import scala.concurrent.ExecutionContext.Implicits.global
+  val user: User = User("James", "F", "239423", "james@gmail.com")
 
-  val result = Await result(GET[User]("http://192.168.0.40:9000/users"), 3 seconds)
+  val get = Await result(GET[List[User]]("http://demo1123999.mockable.io/users"), 3 seconds)
 
-  println(s"Result: $result")
+//  val post = Await result(POST[List[User]]("http://demo1123999.mockable.io/users")(user), 3 seconds)
+  //  val result = Await result(GET[List[User]]("http://192.168.0.40:9000/users"), 3 seconds)
+
+  println(s"GET Result: $get")
+//  println(s"POST Result: $post")
 }
