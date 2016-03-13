@@ -1,21 +1,17 @@
 package com.godis.network.rebound.core
 
-import java.io.BufferedOutputStream
-import java.net.{HttpURLConnection, URL}
-
-import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsScalaMapConverter}
-import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.io.Source
-import scala.util.Success
+import scala.collection.mutable.ListBuffer
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Created by esurua01 on 11/03/2016.
   */
 trait Request {
 
+  def method: String
   def address: String
-  def headers: Map[String, String]
-  def body: Option[Array[Byte]]
+  def headers: List[(String, String)]
+  def body: Option[String]
 }
 
 
@@ -33,49 +29,17 @@ trait Client {
 }
 
 
-case class SimpleResponse(statusCode: Int, headers: Map[String, String], body: String) extends Response {
-  override type Content = String
-}
+trait HTTPMessage {
 
+  val method: String
 
-case class SimpleRequest(address: String, headers: Map[String, String] = Map.empty[String, String],
-                         body: Option[Array[Byte]] = None) extends Request
+  val address: String
 
+  protected def headers = requestHeaders.toList
 
-case class SimpleClient() extends Client {
+  protected val requestHeaders = ListBuffer.empty[(String, String)]
 
-  override def connect(request: Request)(implicit ec: ExecutionContext): Future[Response] = {
+  def header(entry: (String, String)) = requestHeaders += entry
 
-    val promise = Promise[Response]()
-
-    var connection: Option[HttpURLConnection] = None
-
-    Future {
-
-      // Open Connection
-      connection = Some(new URL(request.address).openConnection().asInstanceOf[HttpURLConnection])
-
-      // Set Request Headers
-      connection.foreach(c => request.headers.foreach(h => c.setRequestProperty(h._1, h._2)))
-
-      // Set Request Body
-      connection.foreach(c => request.body.foreach { b =>
-          c.setDoOutput(true)
-          new BufferedOutputStream(c.getOutputStream).write(b)
-      })
-
-      // Generate Response
-      val response = for {
-        statusCode <- connection.map(_.getResponseCode)
-        headers    <- connection.map(_.getHeaderFields.asScala.map(e => (e._1, e._2.asScala.mkString(","))).toMap)
-        body       <- connection.map(c => Source.fromInputStream(c.getInputStream).mkString)
-      } yield SimpleResponse(statusCode, headers, body)
-
-      promise.complete(Success(response.get))
-
-    } recover { case ex => promise.failure(ex)
-    } andThen { case _ => connection.foreach(_.disconnect()) }
-
-    promise.future
-  }
+  implicit val ec: ExecutionContext = ExecutionContext.global
 }

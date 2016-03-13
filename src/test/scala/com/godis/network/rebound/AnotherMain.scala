@@ -1,6 +1,6 @@
 package com.godis.network.rebound
 
-import com.godis.network.rebound.json.SprayClient.GET
+import com.godis.network.rebound.client.SprayHTTP.{GET, POST}
 
 import scala.concurrent.Await
 
@@ -9,13 +9,20 @@ import scala.concurrent.Await
   */
 object AnotherMain extends App {
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-  import scala.concurrent.duration._
   import Protocol._
 
-  val user = User("James", "F", "239423", "james@gmail.com")
+  import scala.concurrent.ExecutionContext.Implicits.global
+  import scala.concurrent.duration._
 
-  val response = Await.result(GET[List[User]]("http://demo6556920.mockable.io/user") !, 3 seconds)
+  val user = User("James", "F", "+234808888330", "james@gmail.com")
 
-  println(s"Content: $response")
+
+  //  val response = Await.result(GET[List[User]]("http://192.168.0.8:9000/users") !, 10 seconds)
+
+//  private val post = POST[List[User]]("http://demo7281011.mockable.io/user")
+  val post = POST[String]("http://192.168.0.8:9000/user")
+  post header("Content-Type" -> "application/json")
+  val response = Await.result(post ! user, 3 seconds)
+
+  println(s"Content: ${response.body}")
 }
