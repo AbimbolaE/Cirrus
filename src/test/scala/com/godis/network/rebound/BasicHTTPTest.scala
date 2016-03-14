@@ -1,7 +1,7 @@
 package com.godis.network.rebound
 
 
-import com.godis.network.rebound.client.Basic.{POST, GET}
+import com.godis.network.rebound.client.BasicHTTP.{GET, POST}
 
 import scala.concurrent.Await
 
@@ -15,11 +15,13 @@ object BasicHTTPTest extends App {
   import scala.concurrent.ExecutionContext.Implicits.global
   import scala.concurrent.duration._
 
-
   val getResponse = Await.result(GET("http://192.168.0.8:9000/users") !, 10 seconds)
+
+  val headers = Map("Content-Type" -> "application/json", "Accept" -> "application/json")
 
   val post = POST("http://192.168.0.8:9000/user")
   post header("Content-Type" -> "application/json")
+  post headers headers
   val postResponse = Await.result(post ! "{ \"user\": true }", 10 seconds)
 
   println(s"Content: ${getResponse.body}")

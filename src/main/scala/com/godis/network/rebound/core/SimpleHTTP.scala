@@ -25,21 +25,19 @@ trait Response {
 
 
 trait Client {
+
   def connect(request: Request)(implicit ec: ExecutionContext): Future[Response]
 }
 
 
-trait HTTPMessage {
-
-  val method: String
+trait HTTPVerb {
 
   val address: String
-
-  protected def headers = requestHeaders.toList
+  val method = getClass.getSimpleName
 
   protected val requestHeaders = ListBuffer.empty[(String, String)]
+  protected def headers = requestHeaders.toList
 
   def header(entry: (String, String)) = requestHeaders += entry
-
-  implicit val ec: ExecutionContext = ExecutionContext.global
+  def headers(entries: TraversableOnce[(String, String)]) = requestHeaders ++= entries
 }

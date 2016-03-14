@@ -10,46 +10,47 @@ import scala.concurrent.{Future, ExecutionContext}
  */
 object SprayHTTP {
 
-  case class GET[T](address: String)(implicit val reader: JsonReader[T], ec: ExecutionContext)
-    extends EmptySprayRequest[T] {
+  case class GET[T](address: String)(implicit val reader: JsonReader[T], val ec: ExecutionContext)
+    extends EmptySprayRequest[T]
 
-    override val method: String = RequestMethods.GET
-  }
+  case class POST[T](address: String)(implicit val reader: JsonReader[T], val ec: ExecutionContext)
+    extends LoadedSprayRequest[T]
+
+  case class PUT[T](address: String)(implicit val reader: JsonReader[T], val ec: ExecutionContext)
+    extends LoadedSprayRequest[T]
+
+  case class DELETE[T](address: String)(implicit val reader: JsonReader[T], val ec: ExecutionContext)
+    extends EmptySprayRequest[T]
 
 
-  case class POST[T](address: String)(implicit val reader: JsonReader[T], ec: ExecutionContext)
-    extends LoadedSprayRequest[T] {
+  trait EmptySprayRequest[T] extends HTTPVerb {
 
-    override val method: String = RequestMethods.POST
-  }
-
-
-  trait EmptySprayRequest[T] extends HTTPMessage {
-
+    implicit val ec: ExecutionContext
     implicit val reader: JsonReader[T]
 
     def send(): Future[Response] = {
 
-      val request = BasicRequest(method = method, address = address, headers = headers)
-
-      basicClient.connect(request) map JSONResponse.create[T]
+      val get = BasicHTTP GET address
+      get headers this.headers
+      get send() map JSONResponse.create[T]
     }
 
     def ! = send()
   }
 
 
-  trait LoadedSprayRequest[T] extends HTTPMessage {
+  trait LoadedSprayRequest[T] extends HTTPVerb {
 
+    implicit val ec: ExecutionContext
     implicit val reader: JsonReader[T]
 
     def send[F : JsonWriter](payload: F): Future[Response] = {
 
       val content = implicitly[JsonWriter[F]].write(payload).compactPrint
 
-      val request = BasicRequest(method = method, address = address, headers = headers, body = Some(content))
-
-      basicClient.connect(request) map JSONResponse.create[T]
+      val post = BasicHTTP POST address
+      post headers this.headers
+      post send content map JSONResponse.create[T]
     }
 
     def ![F : JsonWriter](payload: F) = send[F](payload)
@@ -57,14 +58,15 @@ object SprayHTTP {
 
 
   case class JSONResponse[T: JsonReader](statusCode: Int, headers: Map[String, String], rawBody: String) extends Response {
-    override type Content = T
 
+    override type Content = T
     override def body: Content = implicitly[JsonReader[T]].read(rawBody.parseJson)
   }
 
 
   object JSONResponse {
     def create[T: JsonReader](response: Response) = {
+
       val simpleResponse = response.asInstanceOf[BasicResponse]
       JSONResponse[T](simpleResponse.statusCode, simpleResponse.headers, simpleResponse.body)
     }
