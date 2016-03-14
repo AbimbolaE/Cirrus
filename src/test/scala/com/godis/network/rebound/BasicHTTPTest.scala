@@ -2,6 +2,7 @@ package com.godis.network.rebound
 
 
 import com.godis.network.rebound.client.BasicHTTP.{GET, POST}
+import com.godis.network.rebound.core.{FailedRequest, BasicResponse}
 
 import scala.concurrent.Await
 
@@ -22,8 +23,14 @@ object BasicHTTPTest extends App {
   val post = POST("http://192.168.0.8:9000/user")
   post header("Content-Type" -> "application/json")
   post headers headers
-  val postResponse = Await.result(post ! "{ \"user\": true }", 10 seconds)
 
-  println(s"Content: ${getResponse.body}")
-  println(s"Content: ${postResponse.body}")
+  try {
+
+//    val postResponse = Await.result(post ! "{ \"user\": true }", 10 seconds)
+
+    println(s"Content: ${getResponse.body}")
+//    println(s"Content: ${postResponse.body}")
+  } catch {
+    case ex @ (_:FailedRequest) => println(ex.cause)
+  }
 }

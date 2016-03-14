@@ -5,7 +5,7 @@ import java.net.{HttpURLConnection, URL}
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsScalaMapConverter}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.io.Source
-import scala.util.{Failure, Success}
+import scala.util.{Try, Failure, Success}
 
 /**
  * Created by Abim on 14/03/2016.
@@ -25,8 +25,6 @@ case class BasicClient() extends Client {
     val promise = Promise[Response]()
 
     var connection: Option[HttpURLConnection] = None
-
-    println(request)
 
     Future {
 
@@ -62,10 +60,17 @@ case class BasicClient() extends Client {
           body <- connection.map(c => Source.fromInputStream(c.getInputStream).mkString)
         } yield BasicResponse(statusCode, headers, body)
 
+
         // Extract ErrorStream if necessary
         response map (Success(_)) orElse {
+
           val errorMessage = Source.fromInputStream(connection.get.getErrorStream).mkString
-          Some(Failure(new FailedRequest(errorMessage)))
+
+          val error = Try { connection.get.getInputStream }
+            .recover { case ex => ex }
+            .get.asInstanceOf[Exception]
+
+          Some(Failure(new FailedRequest(errorMessage, error)))
         } foreach promise.complete
       }
 
@@ -76,4 +81,4 @@ case class BasicClient() extends Client {
   }
 }
 
-case class FailedRequest(message: String) extends RuntimeException(message)
+case class FailedRequest(message: String, cause: Exception) extends RuntimeException(message, cause)
