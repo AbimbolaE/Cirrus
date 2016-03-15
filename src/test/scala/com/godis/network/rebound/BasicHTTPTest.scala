@@ -14,8 +14,8 @@ object BasicHTTPTest extends App {
   import scala.concurrent.ExecutionContext.Implicits.global
   import scala.concurrent.duration._
 
-  val get = GET("http://demo6556920.mockable.io/user")
-  get param("foo" -> "bar")
+  val get = GET("https://demo6556920.mockable.io/user")
+//  get param("foo" -> "bar")
   get header("foo" -> "bar")
 
   try {

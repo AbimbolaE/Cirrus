@@ -1,13 +1,10 @@
 package com.godis.network.rebound
 
-import com.godis.network.rebound.client.SprayHTTP.{GET, POST}
+import com.godis.network.rebound.client.SprayHTTP.{PUT, GET, POST}
 
 import scala.concurrent.Await
 
-/**
-  * Created by esurua01 on 11/03/2016.
-  */
-object AnotherMain extends App {
+object SprayHTTPTest extends App {
 
   import Protocol._
 
@@ -20,7 +17,7 @@ object AnotherMain extends App {
 //  val response = Await.result(GET[List[User]]("http://192.168.0.8:9000/users") !, 10 seconds)
 
 //  val post = POST[String]("http://192.168.0.8:9000/user")
-  val post = POST[List[User]]("http://demo7281011.mockable.io/user")
+  val post = PUT[List[User]]("http://demo7281011.mockable.io/user")
   post header("Content-Type" -> "application/json")
   val response = Await.result(post ! user, 3 seconds)
 

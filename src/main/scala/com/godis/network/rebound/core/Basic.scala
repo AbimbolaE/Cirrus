@@ -1,15 +1,13 @@
 package com.godis.network.rebound.core
 
 import java.net.{HttpURLConnection, URL}
+import java.nio.charset.CodingErrorAction
 
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsScalaMapConverter}
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.io.Source
-import scala.util.{Try, Failure, Success}
+import scala.io.{Codec, Source}
+import scala.util.{Failure, Success, Try}
 
-/**
- * Created by Abim on 14/03/2016.
- */
 case class BasicRequest(method: String, address: String, headers: List[(String, String)],
                         params: List[(String, String)], body: Option[String] = None) extends Request
 
@@ -25,12 +23,10 @@ case class BasicClient() extends Client {
 
     var connection: Option[HttpURLConnection] = None
 
-    println(request)
-
     Future {
 
       // Open Connection
-      val queryParams = "?" + request.params.map(p => p._1 + "=" + p._2).mkString(",")
+      val queryParams = if (request.params.nonEmpty) "?" + request.params.map(p => p._1 + "=" + p._2).mkString(",") else ""
       connection = Some(new URL(request.address + queryParams).openConnection().asInstanceOf[HttpURLConnection])
 
       // Set connection Connect Timeout and Read Timeout
@@ -63,7 +59,11 @@ case class BasicClient() extends Client {
           statusCode <- connection.map(_.getResponseCode)
           headers <- connection.map(_.getHeaderFields.asScala.map(e => (e._1, e._2.asScala.mkString(","))).toMap)
           if connection.get.getErrorStream == null
-          body <- connection.map(c => Source.fromInputStream(c.getInputStream).mkString)
+          body <- connection.map(c => {
+            val codec = Codec("UTF-8")
+            codec.onMalformedInput(CodingErrorAction.IGNORE)
+            Source.fromInputStream(c.getInputStream)(codec).mkString
+          })
         } yield BasicResponse(statusCode, headers, body)
 
 

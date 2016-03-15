@@ -4,9 +4,6 @@ import com.godis.network.rebound.core._
 
 import scala.concurrent.ExecutionContext
 
-/**
- * Created by Abim on 12/03/2016.
- */
 object BasicHTTP {
 
   case class GET(address: String)(implicit val ec: ExecutionContext) extends EmptyVerb
