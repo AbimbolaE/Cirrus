@@ -24,11 +24,15 @@ trait Response {
 
 trait Client {
 
-  def connect(request: Request)(implicit ec: ExecutionContext): Future[Response]
+  implicit val ec: ExecutionContext
+
+  def connect(request: Request): Future[Response]
 }
 
 
 trait HTTPVerb {
+
+  implicit val client: BasicClient
 
   val address: String
   val method = getClass.getSimpleName

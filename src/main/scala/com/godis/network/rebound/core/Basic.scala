@@ -15,9 +15,9 @@ case class BasicResponse(statusCode: Int, headers: Map[String, String], body: St
   override type Content = String
 }
 
-case class BasicClient() extends Client {
+case class BasicClient()(implicit val ec: ExecutionContext = ExecutionContext.global) extends Client {
 
-  override def connect(request: Request)(implicit ec: ExecutionContext): Future[Response] = {
+  override def connect(request: Request): Future[Response] = {
 
     val promise = Promise[Response]()
 
@@ -70,7 +70,7 @@ case class BasicClient() extends Client {
         // Extract ErrorStream if necessary
         response map (Success(_)) orElse {
 
-          val errorMessage = Source.fromInputStream(connection.get.getErrorStream).mkString
+          val errorMessage = "\n" + Source.fromInputStream(connection.get.getErrorStream).mkString
 
           val error = Try { connection.get.getInputStream }
             .recover { case ex => ex }

@@ -1,18 +1,16 @@
 package com.godis.network.rebound
 
 
-import com.godis.network.rebound.client.BasicHTTP.{GET, POST}
-import com.godis.network.rebound.core.{FailedRequest, BasicResponse}
+import com.godis.network.rebound.client.BasicHTTP.GET
+import com.godis.network.rebound.client.Defaults
+import Defaults._
+import com.godis.network.rebound.core.FailedRequest
 
 import scala.concurrent.Await
+import scala.concurrent.duration._
 
-/**
-  * Created by esurua01 on 11/03/2016.
-  */
 object BasicHTTPTest extends App {
 
-  import scala.concurrent.ExecutionContext.Implicits.global
-  import scala.concurrent.duration._
 
   val get = GET("https://demo6556920.mockable.io/user")
 //  get param("foo" -> "bar")

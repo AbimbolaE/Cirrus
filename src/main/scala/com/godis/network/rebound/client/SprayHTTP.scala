@@ -3,31 +3,32 @@ package com.godis.network.rebound.client
 import com.godis.network.rebound.core._
 import spray.json._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 object SprayHTTP {
 
-  case class GET[T](address: String)(implicit val reader: JsonReader[T], val ec: ExecutionContext)
-    extends EmptySprayRequest[T]
+  case class GET[T](address: String)(implicit val reader: JsonReader[T], val client: BasicClient)
+    extends EmptySprayVerb[T]
 
-  case class POST[T](address: String)(implicit val reader: JsonReader[T], val ec: ExecutionContext)
-    extends LoadedSprayRequest[T]
+  case class POST[T](address: String)(implicit val reader: JsonReader[T], val client: BasicClient)
+    extends LoadedSprayVerb[T]
 
-  case class PUT[T](address: String)(implicit val reader: JsonReader[T], val ec: ExecutionContext)
-    extends LoadedSprayRequest[T]
+  case class PUT[T](address: String)(implicit val reader: JsonReader[T], val client: BasicClient)
+    extends LoadedSprayVerb[T]
 
-  case class DELETE[T](address: String)(implicit val reader: JsonReader[T], val ec: ExecutionContext)
-    extends EmptySprayRequest[T]
+  case class DELETE[T](address: String)(implicit val reader: JsonReader[T], val client: BasicClient)
+    extends EmptySprayVerb[T]
 
 
-  trait EmptySprayRequest[T] extends HTTPVerb {
+  trait EmptySprayVerb[T] extends HTTPVerb {
 
-    implicit val ec: ExecutionContext
     implicit val reader: JsonReader[T]
 
     def send(): Future[Response] = {
 
-      val verb  = if (method == "GET") BasicHTTP GET address else BasicHTTP DELETE address
+      implicit val ec = client.ec
+
+      val verb = if (method == "GET") BasicHTTP GET address else BasicHTTP DELETE address
 
       verb headers this.headers
       verb send() map JSONResponse.create[T]
@@ -37,16 +38,17 @@ object SprayHTTP {
   }
 
 
-  trait LoadedSprayRequest[T] extends HTTPVerb {
+  trait LoadedSprayVerb[T] extends HTTPVerb {
 
-    implicit val ec: ExecutionContext
     implicit val reader: JsonReader[T]
 
     def send[F : JsonWriter](payload: F): Future[Response] = {
 
+      implicit val ec = client.ec
+
       val content = implicitly[JsonWriter[F]].write(payload).compactPrint
 
-      val verb  = if (method == "POST") BasicHTTP POST address else BasicHTTP PUT address
+      val verb = if (method == "POST") BasicHTTP POST address else BasicHTTP PUT address
 
       verb headers this.headers
       verb send content map JSONResponse.create[T]
