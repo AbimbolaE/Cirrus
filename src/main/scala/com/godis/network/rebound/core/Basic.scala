@@ -17,7 +17,6 @@ case class BasicResponse(statusCode: Int, headers: Map[String, String], body: St
   override type Content = String
 }
 
-
 case class BasicClient() extends Client {
 
   override def connect(request: Request)(implicit ec: ExecutionContext): Future[Response] = {
@@ -30,6 +29,10 @@ case class BasicClient() extends Client {
 
       // Open Connection
       connection = Some(new URL(request.address).openConnection().asInstanceOf[HttpURLConnection])
+
+      // Set connection Connect Timeout and Read Timeout
+      connection.foreach(_.setConnectTimeout(10000))
+      connection.foreach(_.setReadTimeout(5000))
 
       // Set Request Method
       connection.foreach(_.setRequestMethod(request.method))
