@@ -22,7 +22,7 @@ object BasicHTTP {
 
     implicit val ec: ExecutionContext
 
-    def send() = basicClient connect BasicRequest(method = method, address = address, headers = headers)
+    def send() = basicClient connect BasicRequest(method = method, address = address, headers = headers, params = params)
 
     def ! = send()
   }
@@ -33,7 +33,7 @@ object BasicHTTP {
     implicit val ec: ExecutionContext
 
     def send(payload: String) =
-      basicClient connect BasicRequest(method = method, address = address, headers = headers, body = Some(payload))
+      basicClient connect BasicRequest(method = method, address = address, headers = headers, params = params, body = Some(payload))
 
     def !(payload: String) = send(payload)
   }

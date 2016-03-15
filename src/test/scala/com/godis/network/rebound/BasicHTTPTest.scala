@@ -11,26 +11,33 @@ import scala.concurrent.Await
   */
 object BasicHTTPTest extends App {
 
-  import Protocol._
-
   import scala.concurrent.ExecutionContext.Implicits.global
   import scala.concurrent.duration._
 
-  val getResponse = Await.result(GET("http://192.168.0.8:9000/users") !, 10 seconds)
-
-  val headers = Map("Content-Type" -> "application/json", "Accept" -> "application/json")
-
-  val post = POST("http://192.168.0.8:9000/user")
-  post header("Content-Type" -> "application/json")
-  post headers headers
+  val get = GET("http://demo6556920.mockable.io/user")
+  get param("foo" -> "bar")
+  get header("foo" -> "bar")
 
   try {
-
-//    val postResponse = Await.result(post ! "{ \"user\": true }", 10 seconds)
+    val getResponse = Await.result(get !, 10 seconds)
 
     println(s"Content: ${getResponse.body}")
-//    println(s"Content: ${postResponse.body}")
   } catch {
     case ex @ (_:FailedRequest) => println(ex.cause)
   }
+
+  val headers = Map("Content-Type" -> "application/json", "Accept" -> "application/json")
+
+//  val post = POST("http://192.168.0.8:9000/user")
+//  post header("Content-Type" -> "application/json")
+//  post headers headers
+//
+//  try {
+//
+//    val postResponse = Await.result(post ! "{ \"user\": true }", 10 seconds)
+//
+//    println(s"Content: ${postResponse.body}")
+//  } catch {
+//    case ex @ (_:FailedRequest) => println(ex.cause)
+//  }
 }

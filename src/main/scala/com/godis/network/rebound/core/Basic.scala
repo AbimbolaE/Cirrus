@@ -11,7 +11,7 @@ import scala.util.{Try, Failure, Success}
  * Created by Abim on 14/03/2016.
  */
 case class BasicRequest(method: String, address: String, headers: List[(String, String)],
-                        body: Option[String] = None) extends Request
+                        params: List[(String, String)], body: Option[String] = None) extends Request
 
 case class BasicResponse(statusCode: Int, headers: Map[String, String], body: String) extends Response {
   override type Content = String
@@ -25,10 +25,13 @@ case class BasicClient() extends Client {
 
     var connection: Option[HttpURLConnection] = None
 
+    println(request)
+
     Future {
 
       // Open Connection
-      connection = Some(new URL(request.address).openConnection().asInstanceOf[HttpURLConnection])
+      val queryParams = "?" + request.params.map(p => p._1 + "=" + p._2).mkString(",")
+      connection = Some(new URL(request.address + queryParams).openConnection().asInstanceOf[HttpURLConnection])
 
       // Set connection Connect Timeout and Read Timeout
       connection.foreach(_.setConnectTimeout(10000))
