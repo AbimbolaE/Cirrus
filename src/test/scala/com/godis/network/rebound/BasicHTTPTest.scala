@@ -23,7 +23,8 @@ object BasicHTTPTest extends App {
 
 //  val post = POST("http://192.168.0.8:9000/user")
   val post = POST("https://demo6556920.mockable.io/users")
-  post header("Content-Type" -> "application/json")
+
+  post header "Content-Type" -> "application/json"
   post headers headers
 
   try {

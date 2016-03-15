@@ -52,6 +52,7 @@ object SprayHTTP {
 
       verb headers this.headers
       verb header "Content-Type" -> "application/json"
+      verb header "Accept" -> "application/json"
       verb send content map JSONResponse.create[T]
     }
 

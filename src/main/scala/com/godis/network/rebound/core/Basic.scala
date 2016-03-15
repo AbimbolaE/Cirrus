@@ -3,6 +3,8 @@ package com.godis.network.rebound.core
 import java.net.{HttpURLConnection, URL}
 import java.nio.charset.CodingErrorAction
 
+import com.godis.network.rebound.core.BasicClient._
+
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsScalaMapConverter}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.io.{Codec, Source}
@@ -15,7 +17,8 @@ case class BasicResponse(statusCode: Int, headers: Map[String, String], body: St
   override type Content = String
 }
 
-case class BasicClient()(implicit val ec: ExecutionContext = ExecutionContext.global) extends Client {
+case class BasicClient(requestBodyCharset: String = charset, codec: Codec = codec)
+                      (implicit val ec: ExecutionContext = ExecutionContext.global) extends Client {
 
   override def connect(request: Request): Future[Response] = {
 
@@ -42,7 +45,8 @@ case class BasicClient()(implicit val ec: ExecutionContext = ExecutionContext.gl
       // Set Request Body
       connection.foreach(c => request.body.foreach { b =>
         c.setDoOutput(true)
-        c.getOutputStream.write(b.getBytes("UTF-8"))
+        c.setFixedLengthStreamingMode(b.length)
+        c.getOutputStream.write(b.getBytes(requestBodyCharset))
       })
 
       // Generate Response
@@ -50,30 +54,50 @@ case class BasicClient()(implicit val ec: ExecutionContext = ExecutionContext.gl
         statusCode <- connection.map(_.getResponseCode)
         headers <- connection.map(_.getHeaderFields.asScala.map(e => (e._1, e._2.asScala.mkString(","))).toMap)
         if connection.get.getErrorStream == null
-        body <- connection.map(c => {
-          val codec = Codec("UTF-8")
-          codec.onMalformedInput(CodingErrorAction.IGNORE)
-          Source.fromInputStream(c.getInputStream)(codec).mkString
-        })
+        body <- connection.map(c => Source.fromInputStream(c.getInputStream)(codec).mkString)
       } yield Success(BasicResponse(statusCode, headers, body))
 
 
       // Extract ErrorStream if necessary
       response orElse {
 
-        val errorMessage = "\n" + Source.fromInputStream(connection.get.getErrorStream).mkString
+        val response = "\n" + Source.fromInputStream(connection.get.getErrorStream)(codec).mkString
 
         val error = Try { connection.get.getInputStream }
           .recover { case ex => ex }
           .get.asInstanceOf[Exception]
 
-        Some(Failure(new FailedRequest(errorMessage, error)))
+        Some(Failure(new FailedRequest(response, error)))
       } foreach promise.complete
 
     } recover { case ex => promise.failure(ex)
     } andThen { case _ => connection.foreach(_.disconnect()) }
 
     promise.future
+  }
+}
+
+object BasicClient {
+
+  val charset = "UTF-8"
+
+  val codec = {
+    val c = Codec("UTF-8")
+    c.onMalformedInput(CodingErrorAction.IGNORE)
+    c
+  }
+
+  object Builder {
+
+    var basicClient = BasicClient()
+
+    def withExecutionContext(ec: ExecutionContext) = { basicClient = basicClient.copy()(ec); this }
+
+    def withCodec(codec: Codec) = { basicClient = basicClient.copy(codec = codec)(basicClient.ec); this }
+
+    def withRequestBodyCharset(charset: String) = { basicClient = basicClient.copy(requestBodyCharset = charset)(basicClient.ec); this }
+
+    def build() = basicClient
   }
 }
 
