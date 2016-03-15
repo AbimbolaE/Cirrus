@@ -15,8 +15,7 @@ object BasicHTTP {
 
   trait EmptyVerb extends HTTPVerb {
 
-    def send() = client connect BasicRequest(method = method, address = address,
-        headers = headers, params = params)
+    def send() = client connect BasicRequest(method = method, address = address, headers = headers, params = params)
 
     def ! = send()
   }
@@ -24,8 +23,7 @@ object BasicHTTP {
 
   trait LoadedVerb extends HTTPVerb {
 
-    def send(payload: String) = client connect BasicRequest(method = method, address = address,
-        headers = headers, params = params, body = Some(payload))
+    def send(payload: String) = client connect BasicRequest(method, address, headers, params, Some(payload))
 
     def !(payload: String) = send(payload)
   }

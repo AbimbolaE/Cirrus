@@ -45,40 +45,30 @@ case class BasicClient()(implicit val ec: ExecutionContext = ExecutionContext.gl
         c.getOutputStream.write(b.getBytes("UTF-8"))
       })
 
-      if (connection.get.getErrorStream != null) {
-
-        connection.foreach(c => {
-          val body = Source.fromInputStream(c.getErrorStream).mkString
-          val ex = new RuntimeException(body)
-          promise.complete(Failure(ex))
+      // Generate Response
+      val response = for {
+        statusCode <- connection.map(_.getResponseCode)
+        headers <- connection.map(_.getHeaderFields.asScala.map(e => (e._1, e._2.asScala.mkString(","))).toMap)
+        if connection.get.getErrorStream == null
+        body <- connection.map(c => {
+          val codec = Codec("UTF-8")
+          codec.onMalformedInput(CodingErrorAction.IGNORE)
+          Source.fromInputStream(c.getInputStream)(codec).mkString
         })
-      } else {
-
-        // Generate Response
-        val response = for {
-          statusCode <- connection.map(_.getResponseCode)
-          headers <- connection.map(_.getHeaderFields.asScala.map(e => (e._1, e._2.asScala.mkString(","))).toMap)
-          if connection.get.getErrorStream == null
-          body <- connection.map(c => {
-            val codec = Codec("UTF-8")
-            codec.onMalformedInput(CodingErrorAction.IGNORE)
-            Source.fromInputStream(c.getInputStream)(codec).mkString
-          })
-        } yield BasicResponse(statusCode, headers, body)
+      } yield Success(BasicResponse(statusCode, headers, body))
 
 
-        // Extract ErrorStream if necessary
-        response map (Success(_)) orElse {
+      // Extract ErrorStream if necessary
+      response orElse {
 
-          val errorMessage = "\n" + Source.fromInputStream(connection.get.getErrorStream).mkString
+        val errorMessage = "\n" + Source.fromInputStream(connection.get.getErrorStream).mkString
 
-          val error = Try { connection.get.getInputStream }
-            .recover { case ex => ex }
-            .get.asInstanceOf[Exception]
+        val error = Try { connection.get.getInputStream }
+          .recover { case ex => ex }
+          .get.asInstanceOf[Exception]
 
-          Some(Failure(new FailedRequest(errorMessage, error)))
-        } foreach promise.complete
-      }
+        Some(Failure(new FailedRequest(errorMessage, error)))
+      } foreach promise.complete
 
     } recover { case ex => promise.failure(ex)
     } andThen { case _ => connection.foreach(_.disconnect()) }
@@ -87,4 +77,4 @@ case class BasicClient()(implicit val ec: ExecutionContext = ExecutionContext.gl
   }
 }
 
-case class FailedRequest(message: String, cause: Exception) extends RuntimeException(message, cause)
+case class FailedRequest(response: String, cause: Exception) extends RuntimeException(cause)

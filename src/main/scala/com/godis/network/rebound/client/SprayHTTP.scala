@@ -51,6 +51,7 @@ object SprayHTTP {
       val verb = if (method == "POST") BasicHTTP POST address else BasicHTTP PUT address
 
       verb headers this.headers
+      verb header "Content-Type" -> "application/json"
       verb send content map JSONResponse.create[T]
     }
 
