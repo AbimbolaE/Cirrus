@@ -15,7 +15,9 @@ object SprayHTTPTest extends App {
 
   implicit val client = BasicClient
     .Builder
-    .withRequestBodyCharset("UTF-7")
+    .withRequestBodyCharset("UTF-8")
+    .withTweak(_.setConnectTimeout(0))
+    .withTweak(_.setReadTimeout(0))
     .build()
 
   val user = User("James", "F", "+234808888330", "james@gmail.com")
