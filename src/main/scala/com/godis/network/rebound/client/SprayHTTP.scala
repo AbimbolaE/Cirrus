@@ -31,6 +31,7 @@ object SprayHTTP {
       val verb = if (method == "GET") BasicHTTP GET address else BasicHTTP DELETE address
 
       verb headers this.headers
+      verb header "Accept" -> "application/json"
       verb send() map JSONResponse.create[T]
     }
 

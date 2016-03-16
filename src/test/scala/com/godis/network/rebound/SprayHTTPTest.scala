@@ -15,6 +15,10 @@ object SprayHTTPTest extends App {
 
   implicit val client = BasicClient
     .Builder
+    .withDefaultHeaders(List(
+      "Content-Type" -> "application/json",
+      "Accept" -> "application/json"
+    ))
     .withRequestBodyCharset("UTF-8")
     .withTweak(_.setConnectTimeout(0))
     .withTweak(_.setReadTimeout(0))

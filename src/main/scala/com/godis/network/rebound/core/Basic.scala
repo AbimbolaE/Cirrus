@@ -1,11 +1,11 @@
 package com.godis.network.rebound.core
 
 import java.net.{HttpURLConnection, URL}
-import java.nio.charset.CodingErrorAction
 
-import com.godis.network.rebound.core.BasicClient.Defaults._
+import com.godis.network.rebound.Defaults.ClientConfig._
 
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsScalaMapConverter}
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.io.{Codec, Source}
 import scala.util.{Failure, Success, Try}
@@ -18,6 +18,7 @@ case class BasicResponse(statusCode: Int, headers: Map[String, String], body: St
 }
 
 case class BasicClient(requestBodyCharset: String = charset, codec: Codec = codec,
+                       defaultHeaders: List[(String, String)] = headers,
                        tweaks: List[(HttpURLConnection) => Unit] = tweaks)
                       (implicit val ec: ExecutionContext = ExecutionContext.global) extends Client {
 
@@ -33,11 +34,14 @@ case class BasicClient(requestBodyCharset: String = charset, codec: Codec = code
       val queryParams = if (request.params.nonEmpty) "?" + request.params.map(p => p._1 + "=" + p._2).mkString(",") else ""
       connection = Some(new URL(request.address + queryParams).openConnection().asInstanceOf[HttpURLConnection])
 
+      // Set Request Method
+      connection.foreach(_.setRequestMethod(request.method))
+
       // Apply Default Tweaks
       connection.foreach(c => tweaks.foreach(_(c)))
 
-      // Set Request Method
-      connection.foreach(_.setRequestMethod(request.method))
+      // Apply Default Headers
+      connection.foreach(c => defaultHeaders.foreach(h => c.setRequestProperty(h._1, h._2)))
 
       // Set Request Headers
       connection.foreach(c => request.headers.foreach(h => c.setRequestProperty(h._1, h._2)))
@@ -77,25 +81,21 @@ case class BasicClient(requestBodyCharset: String = charset, codec: Codec = code
 
 object BasicClient {
 
-  object Defaults {
-
-    val charset = "UTF-8"
-
-    val codec = {
-      val c = Codec("UTF-8")
-      c.onMalformedInput(CodingErrorAction.IGNORE)
-      c
-    }
-
-    val tweaks = List(
-      (h: HttpURLConnection) => h.setReadTimeout(10000),
-      (h: HttpURLConnection) => h.setConnectTimeout(5000)
-    )
-  }
-
   object Builder {
 
-    private var basicClient = BasicClient()
+    private val _defaultHeaders = ListBuffer.empty[(String, String)]
+
+    private var basicClient = BasicClient(defaultHeaders = _defaultHeaders.toList)
+
+    def withDefaultHeaders(headers: List[(String, String)]) = {
+      _defaultHeaders ++= headers
+      this
+    }
+
+    def withDefaultHeader(header: (String, String)) = {
+      _defaultHeaders += header
+      this
+    }
 
     def withExecutionContext(ec: ExecutionContext) = {
       basicClient = basicClient.copy()(ec)
@@ -113,7 +113,7 @@ object BasicClient {
     }
 
     def withTweak(tweak: (HttpURLConnection) => Unit) = {
-      basicClient = basicClient.copy(tweaks = tweak :: basicClient.tweaks)(basicClient.ec)
+      basicClient = basicClient.copy(tweaks = basicClient.tweaks ::: tweak :: Nil)(basicClient.ec)
       this
     }
 
