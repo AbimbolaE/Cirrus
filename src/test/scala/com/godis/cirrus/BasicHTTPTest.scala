@@ -1,8 +1,8 @@
-package com.godis.network.rebound
+package com.godis.cirrus
 
-import com.godis.network.rebound.client.BasicHTTP.{POST, GET}
-import com.godis.network.rebound.Defaults.defaultClient
-import com.godis.network.rebound.core.FailedRequest
+import com.godis.cirrus.client.BasicHTTP.{POST, GET}
+import com.godis.cirrus.core.FailedRequest
+import com.godis.cirrus.Defaults._
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -19,7 +19,7 @@ object BasicHTTPTest extends App {
     case ex @ (_:FailedRequest) => println(ex.cause)
   }
 
-  val headers = Map("Content-Type" -> "application/text", "Accept" -> "application/json")
+  val headers = Map("Content-Type" -> "application/json", "Accept" -> "application/json")
 
 //  val post = POST("http://192.168.0.8:9000/user")
   val post = POST("https://demo6556920.mockable.io/users")

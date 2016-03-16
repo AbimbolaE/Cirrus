@@ -1,6 +1,6 @@
-package com.godis.network.rebound.client
+package com.godis.cirrus.client
 
-import com.godis.network.rebound.core.{BasicClient, BasicRequest, HTTPVerb}
+import com.godis.cirrus.core.{BasicClient, BasicRequest, HTTPVerb}
 
 object BasicHTTP {
 

@@ -1,4 +1,4 @@
-package com.godis.network.rebound.core
+package com.godis.cirrus.core
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}

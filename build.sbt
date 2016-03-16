@@ -1,4 +1,4 @@
-name := "rebound"
+name := "cirrus"
 
 version := "0.0.1"
 

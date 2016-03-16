@@ -1,8 +1,7 @@
-package com.godis.network.rebound.client
+package com.godis.cirrus.client
 
-import com.godis.network.rebound.Defaults.Headers
-import com.godis.network.rebound.Defaults.Headers._
-import com.godis.network.rebound.core._
+import com.godis.cirrus.core.{BasicResponse, Response, HTTPVerb, BasicClient}
+import com.godis.cirrus.Defaults.Headers._
 import spray.json._
 
 import scala.concurrent.Future

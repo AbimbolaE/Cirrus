@@ -1,4 +1,4 @@
-package com.godis.network.rebound
+package com.godis.cirrus
 
 import spray.json.DefaultJsonProtocol
 

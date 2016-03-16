@@ -1,9 +1,9 @@
-package com.godis.network.rebound
+package com.godis.cirrus
 
 import java.net.HttpURLConnection
 import java.nio.charset.CodingErrorAction
 
-import com.godis.network.rebound.core.BasicClient
+import com.godis.cirrus.core.BasicClient
 
 import scala.io.Codec
 

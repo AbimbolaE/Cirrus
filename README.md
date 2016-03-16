@@ -1,3 +1,3 @@
-# Rebound
+# Cirrus
 
-A scala http client for the android applications
+A scala http client for the consuming REST APIs

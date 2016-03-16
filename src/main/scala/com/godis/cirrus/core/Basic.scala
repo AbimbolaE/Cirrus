@@ -1,8 +1,8 @@
-package com.godis.network.rebound.core
+package com.godis.cirrus.core
 
 import java.net.{HttpURLConnection, URL}
 
-import com.godis.network.rebound.Defaults.ClientConfig._
+import com.godis.cirrus.Defaults.ClientConfig._
 
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsScalaMapConverter}
 import scala.collection.mutable.ListBuffer

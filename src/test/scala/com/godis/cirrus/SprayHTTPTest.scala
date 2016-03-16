@@ -1,12 +1,13 @@
-package com.godis.network.rebound
+package com.godis.cirrus
 
-import com.godis.network.rebound.core.{BasicClient, FailedRequest}
+import com.godis.cirrus.client.SprayHTTP
+import com.godis.cirrus.core.{BasicClient, FailedRequest}
 
 import scala.language.postfixOps
 
-//import com.godis.network.rebound.Defaults._
-import com.godis.network.rebound.Protocol._
-import com.godis.network.rebound.client.SprayHTTP.POST
+//import com.godis.cirrus.Defaults._
+import Protocol._
+import SprayHTTP.POST
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
