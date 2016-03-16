@@ -12,9 +12,18 @@ object Defaults {
   implicit val defaultClient = BasicClient()
 
   object Headers {
+
     val `Accept` = "Accept"
+    val `Accept-Charset` = "Accept-Charset"
+    val `Accept-Encoding` = "Accept-Encoding"
+    val `Authorization` = "Authorization"
+    val `Cache-Control` = "Cache-Control"
     val `Content-Type` = "Content-Type"
+
     val `application/json` = "application/json"
+    val `application/x-www-form-urlencoded` = "application/x-www-form-urlencoded"
+    val `application/xml` = "application/xml"
+    val `text/plain` = "text/plain"
   }
 
   object ClientConfig {
@@ -27,7 +36,7 @@ object Defaults {
       c
     }
 
-    val headers = List("Content-Type" -> "text/plain")
+    val headers = List.empty[(String, String)]
 
     val tweaks = List(
       (h: HttpURLConnection) => h.setReadTimeout(10000),
