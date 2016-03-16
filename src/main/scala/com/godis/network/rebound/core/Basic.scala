@@ -28,6 +28,10 @@ case class BasicClient(requestBodyCharset: String = charset, codec: Codec = code
 
     var connection: Option[HttpURLConnection] = None
 
+    println(s"Client: $this")
+
+    println(s"Request: $request")
+
     Future {
 
       // Open Connection

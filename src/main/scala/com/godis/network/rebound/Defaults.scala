@@ -9,6 +9,14 @@ import scala.io.Codec
 
 object Defaults {
 
+  implicit val defaultClient = BasicClient()
+
+  object Headers {
+    val `Accept` = "Accept"
+    val `Content-Type` = "Content-Type"
+    val `application/json` = "application/json"
+  }
+
   object ClientConfig {
 
     val charset = "UTF-8"
@@ -26,6 +34,4 @@ object Defaults {
       (h: HttpURLConnection) => h.setConnectTimeout(5000)
     )
   }
-
-  implicit val defaultClient = BasicClient()
 }

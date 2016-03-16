@@ -20,13 +20,11 @@ object SprayHTTPTest extends App {
       "Accept" -> "application/json"
     ))
     .withRequestBodyCharset("UTF-8")
-    .withTweak(_.setConnectTimeout(0))
-    .withTweak(_.setReadTimeout(0))
     .build()
 
   val user = User("James", "F", "+234808888330", "james@gmail.com")
 
-  val post = POST[List[User]]("http://demo6556920.mockable.io/users")
+  val post = POST[List[User]]("http://demo6556920.mockable.io/users") withParam("foo" -> "bar")
 
   try {
 

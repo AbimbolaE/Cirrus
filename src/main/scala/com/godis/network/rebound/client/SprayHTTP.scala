@@ -1,5 +1,7 @@
 package com.godis.network.rebound.client
 
+import com.godis.network.rebound.Defaults.Headers
+import com.godis.network.rebound.Defaults.Headers._
 import com.godis.network.rebound.core._
 import spray.json._
 
@@ -30,8 +32,8 @@ object SprayHTTP {
 
       val verb = if (method == "GET") BasicHTTP GET address else BasicHTTP DELETE address
 
-      verb headers this.headers
-      verb header "Accept" -> "application/json"
+      verb withHeaders this.headers
+      verb withHeader `Accept` -> `application/json`
       verb send() map JSONResponse.create[T]
     }
 
@@ -51,9 +53,8 @@ object SprayHTTP {
 
       val verb = if (method == "POST") BasicHTTP POST address else BasicHTTP PUT address
 
-      verb headers this.headers
-      verb header "Content-Type" -> "application/json"
-      verb header "Accept" -> "application/json"
+      verb withHeaders this.headers
+      verb withHeader `Content-Type` -> `application/json` withHeader `Accept` -> `application/json`
       verb send content map JSONResponse.create[T]
     }
 

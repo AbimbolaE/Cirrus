@@ -43,9 +43,9 @@ trait HTTPVerb {
   protected def headers = requestHeaders.toList
   protected def params = requestParams.toList
 
-  def header(entry: (String, String)) = requestHeaders += entry
-  def headers(entries: TraversableOnce[(String, String)]) = requestHeaders ++= entries
+  def withHeader(entry: (String, String)): this.type = { requestHeaders += entry; this }
+  def withHeaders(entries: TraversableOnce[(String, String)]): this.type  = { requestHeaders ++= entries; this }
 
-  def param(entry: (String, String)) = requestParams += entry
-  def params(entries: TraversableOnce[(String, String)]) = requestParams ++= entries
+  def withParam(entry: (String, String)): this.type  = { requestParams += entry; this }
+  def withParams(entries: TraversableOnce[(String, String)]): this.type  = { requestParams ++= entries; this }
 }
