@@ -28,14 +28,10 @@ case class BasicClient(requestBodyCharset: String = charset, codec: Codec = code
 
     var connection: Option[HttpURLConnection] = None
 
-    println(s"Client: $this")
-
-    println(s"Request: $request")
-
     Future {
 
       // Open Connection
-      val queryParams = if (request.params.nonEmpty) "?" + request.params.map(p => p._1 + "=" + p._2).mkString("&") else ""
+      val queryParams = if (request.params.nonEmpty) request.params.map(p => p._1 + "=" + p._2).mkString("?", "&", "") else ""
       connection = Some(new URL(request.address + queryParams).openConnection().asInstanceOf[HttpURLConnection])
 
       // Set Request Method

@@ -6,8 +6,8 @@ import com.godis.cirrus.core.{BasicClient, FailedRequest}
 import scala.language.postfixOps
 
 //import com.godis.cirrus.Defaults._
-import Protocol._
-import SprayHTTP.POST
+import com.godis.cirrus.Protocol._
+import com.godis.cirrus.client.SprayHTTP.POST
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
