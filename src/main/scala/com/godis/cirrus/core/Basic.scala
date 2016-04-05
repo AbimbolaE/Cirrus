@@ -26,54 +26,54 @@ case class BasicClient(requestBodyCharset: String = charset, codec: Codec = code
 
     val promise = Promise[Response]()
 
-    var connection: Option[HttpURLConnection] = None
+    var connectionOpt: Option[HttpURLConnection] = None
 
     Future {
 
       // Open Connection
       val queryParams = if (request.params.nonEmpty) request.params.map(p => p._1 + "=" + p._2).mkString("?", "&", "") else ""
-      connection = Some(new URL(request.address + queryParams).openConnection().asInstanceOf[HttpURLConnection])
+      connectionOpt = Some(new URL(request.address + queryParams).openConnection().asInstanceOf[HttpURLConnection])
 
       // Set Request Method
-      connection.foreach(_.setRequestMethod(request.method))
+      connectionOpt foreach (_.setRequestMethod(request.method))
 
       // Apply Default Tweaks
-      connection.foreach(c => tweaks.foreach(_(c)))
+      connectionOpt foreach (c => tweaks.foreach(_ (c)))
 
       // Apply Default Headers
-      connection.foreach(c => defaultHeaders.foreach(h => c.setRequestProperty(h._1, h._2)))
+      connectionOpt foreach (c => defaultHeaders.foreach(h => c.setRequestProperty(h._1, h._2)))
 
       // Set Request Headers
-      connection.foreach(c => request.headers.foreach(h => c.setRequestProperty(h._1, h._2)))
+      connectionOpt foreach (c => request.headers.foreach(h => c.setRequestProperty(h._1, h._2)))
 
       // Set Request Body
-      connection.foreach(c => request.body.foreach { b =>
+      connectionOpt foreach (c => request.body.foreach { b =>
         c.setDoOutput(true)
         c.setFixedLengthStreamingMode(b.length)
         c.getOutputStream.write(b.getBytes(requestBodyCharset))
       })
 
       // Generate Response
-      val response = for {
-        statusCode <- connection.map(_.getResponseCode)
-        headers <- connection.map(_.getHeaderFields.asScala.map(e => (e._1, e._2.asScala.mkString(","))).toMap)
-        if connection.get.getErrorStream == null
-        body <- connection.map(c => Source.fromInputStream(c.getInputStream)(codec).mkString)
+      val responseOpt = for {
+        statusCode <- connectionOpt map (_.getResponseCode)
+        headers <- connectionOpt map (_.getHeaderFields.asScala.map(e => (e._1, e._2.asScala.mkString(","))).toMap)
+        if connectionOpt.get.getErrorStream == null
+        body <- connectionOpt map (c => Source.fromInputStream(c.getInputStream)(codec).mkString)
       } yield Success(BasicResponse(statusCode, headers, body))
 
 
       // Extract ErrorStream if necessary
-      response orElse {
+      responseOpt orElse {
 
-        val response = "\n" + Source.fromInputStream(connection.get.getErrorStream)(codec).mkString
+        val responseMessage = "\n" + Source.fromInputStream(connectionOpt.get.getErrorStream)(codec).mkString
 
-        val error = Try(connection.get.getInputStream).recover { case ex => ex }.get.asInstanceOf[Exception]
+        val exception = Try(connectionOpt.get.getInputStream).recover { case ex => ex }.get.asInstanceOf[Exception]
 
-        Some(Failure(new FailedRequest(response, error)))
+        Some(Failure(new FailedRequest(responseMessage, exception)))
       } foreach promise.complete
 
     } recover { case ex => promise.failure(ex)
-    } andThen { case _ => connection.foreach(_.disconnect()) }
+    } andThen { case _ => connectionOpt.foreach(_.disconnect()) }
 
     promise.future
   }
@@ -81,13 +81,13 @@ case class BasicClient(requestBodyCharset: String = charset, codec: Codec = code
 
 object BasicClient {
 
-  object Builder {
+  case class Builder() {
 
     private val _defaultHeaders = ListBuffer.empty[(String, String)]
 
     private var basicClient = BasicClient(defaultHeaders = _defaultHeaders.toList)
 
-    def withDefaultHeaders(headers: List[(String, String)]) = {
+    def withDefaultHeaders(headers: Seq[(String, String)]) = {
       _defaultHeaders ++= headers
       this
     }

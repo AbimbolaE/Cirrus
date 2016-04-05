@@ -33,10 +33,10 @@ object BasicHTTP {
     def send(form: Map[String, String]): Future[Response] = {
       withHeader(`Content-Type` -> `application/x-www-form-urlencoded`)
 
-      val encoder: (String) => String = URLEncoder.encode(_, client.requestBodyCharset)
+      val encode: (String) => String = URLEncoder.encode(_, client.requestBodyCharset)
 
       val encodedPayload = form
-        .map(h => (encoder(h._1), encoder(h._2)))
+        .map(h => (encode(h._1), encode(h._2)))
         .map(h => h._1 + "=" + h._2)
         .mkString("&")
 
@@ -44,5 +44,7 @@ object BasicHTTP {
     }
 
     def !(payload: String) = send(payload)
+
+    def !(form: Map[String, String]) = send(form)
   }
 }

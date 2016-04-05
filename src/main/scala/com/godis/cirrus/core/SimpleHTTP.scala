@@ -32,7 +32,7 @@ trait Client {
 
 trait HTTPVerb {
 
-  implicit val client: BasicClient
+  val client: BasicClient
 
   val address: String
   val method = getClass.getSimpleName
@@ -44,8 +44,8 @@ trait HTTPVerb {
   protected def params = requestParams.toList
 
   def withHeader(entry: (String, String)): this.type = { requestHeaders += entry; this }
-  def withHeaders(entries: TraversableOnce[(String, String)]): this.type  = { requestHeaders ++= entries; this }
+  def withHeaders(entries: TraversableOnce[(String, String)]): this.type = { requestHeaders ++= entries; this }
 
-  def withParam(entry: (String, String)): this.type  = { requestParams += entry; this }
-  def withParams(entries: TraversableOnce[(String, String)]): this.type  = { requestParams ++= entries; this }
+  def withParam(entry: (String, String)): this.type = { requestParams += entry; this }
+  def withParams(entries: TraversableOnce[(String, String)]): this.type = { requestParams ++= entries; this }
 }

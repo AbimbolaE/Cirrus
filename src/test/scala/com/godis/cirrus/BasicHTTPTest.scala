@@ -1,7 +1,5 @@
 package com.godis.cirrus
 
-import java.util.concurrent.Executors
-
 import com.godis.cirrus.client.BasicHTTP.{GET, POST}
 import com.godis.cirrus.core.{BasicClient, FailedRequest}
 //import com.godis.cirrus.Defaults._
@@ -12,7 +10,7 @@ import scala.concurrent.duration._
 object BasicHTTPTest extends App {
 
   implicit val client = BasicClient
-      .Builder
+      .Builder()
       .withTweak(_.setInstanceFollowRedirects(false))
       .build()
 

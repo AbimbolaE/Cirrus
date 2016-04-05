@@ -1,6 +1,7 @@
 package com.godis.cirrus.client
 
 import com.godis.cirrus.Defaults.Headers._
+import com.godis.cirrus.Defaults.defaultClient
 import com.godis.cirrus.core.{BasicClient, BasicResponse, HTTPVerb, Response}
 import spray.json._
 
@@ -33,7 +34,7 @@ object SprayHTTP {
 
       verb withHeaders this.headers
       verb withHeader `Accept` -> `application/json`
-      verb send() map JSONResponse.create[T]
+      verb send() map JSONBuilder.usingSpray[T]
     }
 
     def ! = send()
@@ -54,25 +55,9 @@ object SprayHTTP {
 
       verb withHeaders this.headers
       verb withHeader `Content-Type` -> `application/json` withHeader `Accept` -> `application/json`
-      verb send content map JSONResponse.create[T]
+      verb send content map JSONBuilder.usingSpray[T]
     }
 
     def ![F : JsonWriter](payload: F) = send[F](payload)
-  }
-
-
-  case class JSONResponse[T: JsonReader](statusCode: Int, headers: Map[String, String], rawBody: String) extends Response {
-
-    override type Content = T
-    override def body: Content = implicitly[JsonReader[T]].read(rawBody.parseJson)
-  }
-
-
-  object JSONResponse {
-    def create[T: JsonReader](response: Response) = {
-
-      val simpleResponse = response.asInstanceOf[BasicResponse]
-      JSONResponse[T](simpleResponse.statusCode, simpleResponse.headers, simpleResponse.body)
-    }
   }
 }
