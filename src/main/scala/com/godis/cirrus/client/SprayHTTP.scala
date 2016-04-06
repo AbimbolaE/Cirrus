@@ -2,7 +2,7 @@ package com.godis.cirrus.client
 
 import com.godis.cirrus.Defaults.Headers._
 import com.godis.cirrus.Defaults.defaultClient
-import com.godis.cirrus.core.{BasicClient, BasicResponse, HTTPVerb, Response}
+import com.godis.cirrus.core.{BasicClient, HTTPVerb, Response}
 import spray.json._
 
 import scala.concurrent.Future
