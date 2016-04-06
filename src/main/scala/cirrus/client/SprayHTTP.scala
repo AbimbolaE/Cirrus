@@ -1,8 +1,7 @@
-package com.godis.cirrus.client
+package cirrus.client
 
-import com.godis.cirrus.Defaults.Headers._
-import com.godis.cirrus.Defaults.defaultClient
-import com.godis.cirrus.core.{BasicClient, HTTPVerb, Response}
+import cirrus.Defaults.Headers._
+import cirrus.internal.{BasicClient, HTTPVerb, Response}
 import spray.json._
 
 import scala.concurrent.Future
@@ -26,7 +25,7 @@ object SprayHTTP {
 
     implicit val reader: JsonReader[T]
 
-    def send(): Future[Response] = {
+    def send: Future[Response] = {
 
       implicit val ec = client.ec
 
@@ -34,10 +33,10 @@ object SprayHTTP {
 
       verb withHeaders this.headers
       verb withHeader `Accept` -> `application/json`
-      verb send() map JSONBuilder.usingSpray[T]
+      verb.send map JSONBuilder.usingSpray[T]
     }
 
-    def ! = send()
+    def ! = send
   }
 
 

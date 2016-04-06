@@ -1,10 +1,9 @@
-package com.godis.cirrus.client
+package cirrus.client
 
 import argonaut.Argonaut._
 import argonaut._
-import com.godis.cirrus.Defaults.Headers._
-import com.godis.cirrus.Defaults.defaultClient
-import com.godis.cirrus.core.{BasicClient, HTTPVerb, Response}
+import cirrus.Defaults.Headers._
+import cirrus.internal.{BasicClient, HTTPVerb, Response}
 
 import scala.concurrent.Future
 
@@ -30,7 +29,7 @@ object ArgonautHTTP {
 
     implicit val decoder: DecodeJson[T]
 
-    def send(): Future[Response] = {
+    def send: Future[Response] = {
 
       implicit val ec = client.ec
 
@@ -38,10 +37,10 @@ object ArgonautHTTP {
 
       verb withHeaders this.headers
       verb withHeader `Accept` -> `application/json`
-      verb send() map JSONBuilder.usingArgonaut[T]
+      verb.send map JSONBuilder.usingArgonaut[T]
     }
 
-    def ! = send()
+    def ! = send
   }
 
 

@@ -1,7 +1,7 @@
-package com.godis.cirrus
+package cirrus
 
 import argonaut.DecodeJson
-import com.godis.cirrus.core.{BasicResponse, Response}
+import internal.{BasicResponse, Response}
 import spray.json.JsonReader
 
 /**
@@ -14,14 +14,14 @@ package object client {
 
     def usingSpray[T: JsonReader](response: Response) = {
 
-      val simpleResponse = response.asInstanceOf[BasicResponse]
-      SprayResponse[T](simpleResponse.statusCode, simpleResponse.headers, simpleResponse.body)
+      val basicResponse = response.asInstanceOf[BasicResponse]
+      SprayResponse[T](basicResponse.statusCode, basicResponse.headers, basicResponse.body)
     }
 
     def usingArgonaut[T: DecodeJson](response: Response) = {
 
-      val simpleResponse = response.asInstanceOf[BasicResponse]
-      ArgonautResponse[T](simpleResponse.statusCode, simpleResponse.headers, simpleResponse.body)
+      val basicResponse = response.asInstanceOf[BasicResponse]
+      ArgonautResponse[T](basicResponse.statusCode, basicResponse.headers, basicResponse.body)
     }
   }
 
@@ -37,7 +37,8 @@ package object client {
   case class ArgonautResponse[T: DecodeJson](statusCode: Int, headers: Map[String, String], rawBody: String)
     extends Response {
 
-    import argonaut._, Argonaut._
+    import argonaut._
+    import Argonaut._
 
     override type Content = T
     override lazy val body: Content = rawBody.decodeOption(implicitly[DecodeJson[T]]).get

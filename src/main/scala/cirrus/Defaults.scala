@@ -1,15 +1,15 @@
-package com.godis.cirrus
+package cirrus
 
 import java.net.HttpURLConnection
 import java.nio.charset.CodingErrorAction
 
-import com.godis.cirrus.core.BasicClient
+import internal.BasicClient
 
 import scala.io.Codec
 
 object Defaults {
 
-  implicit val defaultClient = BasicClient()
+  implicit val client = BasicClient()
 
   object Headers {
 

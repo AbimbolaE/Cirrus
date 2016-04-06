@@ -1,4 +1,4 @@
-package com.godis.cirrus.core
+package cirrus.internal
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,7 +32,7 @@ trait Client {
 
 trait HTTPVerb {
 
-  val client: BasicClient
+  implicit val client: BasicClient
 
   val address: String
   val method = getClass.getSimpleName

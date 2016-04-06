@@ -1,4 +1,4 @@
-package com.godis.cirrus
+package cirrus
 
 import spray.json.DefaultJsonProtocol
 

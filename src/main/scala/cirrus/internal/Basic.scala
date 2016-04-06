@@ -1,11 +1,10 @@
-package com.godis.cirrus.core
+package cirrus.internal
 
 import java.net.{HttpURLConnection, URL}
 
-import com.godis.cirrus.Defaults.ClientConfig._
+import cirrus.Defaults.ClientConfig._
 
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsScalaMapConverter}
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.io.{Codec, Source}
 import scala.util.{Failure, Success, Try}
@@ -18,8 +17,8 @@ case class BasicResponse(statusCode: Int, headers: Map[String, String], body: St
 }
 
 case class BasicClient(requestBodyCharset: String = charset, codec: Codec = codec,
-                       defaultHeaders: List[(String, String)] = headers,
-                       tweaks: List[(HttpURLConnection) => Unit] = tweaks)
+                       defaultHeaders: Seq[(String, String)] = headers,
+                       tweaks: Seq[(HttpURLConnection) => Unit] = tweaks)
                       (implicit val ec: ExecutionContext = ExecutionContext.global) extends Client {
 
   override def connect(request: Request): Future[Response] = {
@@ -83,19 +82,7 @@ object BasicClient {
 
   case class Builder() {
 
-    private val _defaultHeaders = ListBuffer.empty[(String, String)]
-
-    private var basicClient = BasicClient(defaultHeaders = _defaultHeaders.toList)
-
-    def withDefaultHeaders(headers: Seq[(String, String)]) = {
-      _defaultHeaders ++= headers
-      this
-    }
-
-    def withDefaultHeader(header: (String, String)) = {
-      _defaultHeaders += header
-      this
-    }
+    private var basicClient = BasicClient()
 
     def withExecutionContext(ec: ExecutionContext) = {
       basicClient = basicClient.copy()(ec)
@@ -113,7 +100,17 @@ object BasicClient {
     }
 
     def withTweak(tweak: (HttpURLConnection) => Unit) = {
-      basicClient = basicClient.copy(tweaks = basicClient.tweaks ::: tweak :: Nil)(basicClient.ec)
+      basicClient = basicClient.copy(tweaks = basicClient.tweaks :+ tweak)(basicClient.ec)
+      this
+    }
+
+    def withDefaultHeader(header: (String, String)) = {
+      basicClient = basicClient.copy(defaultHeaders = basicClient.defaultHeaders :+ header)(basicClient.ec)
+      this
+    }
+
+    def withDefaultHeaders(headers: Seq[(String, String)]) = {
+      basicClient = basicClient.copy(defaultHeaders = basicClient.defaultHeaders ++ headers)(basicClient.ec)
       this
     }
 

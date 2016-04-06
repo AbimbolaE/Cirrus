@@ -1,8 +1,7 @@
-package com.godis.cirrus
+package cirrus
 
-import com.godis.cirrus.client.BasicHTTP.{GET, POST}
-import com.godis.cirrus.core.{BasicClient, FailedRequest}
-//import com.godis.cirrus.Defaults._
+import cirrus.client.BasicHTTP.{GET, POST}
+import internal.{BasicClient, FailedRequest}
 
 import scala.concurrent.{ExecutionContext, Await}
 import scala.concurrent.duration._

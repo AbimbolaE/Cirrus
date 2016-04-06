@@ -1,9 +1,9 @@
-package com.godis.cirrus.client
+package cirrus.client
 
 import java.net.URLEncoder
 
-import com.godis.cirrus.Defaults.Headers._
-import com.godis.cirrus.core.{BasicClient, BasicRequest, HTTPVerb, Response}
+import cirrus.Defaults.Headers._
+import cirrus.internal.{BasicClient, BasicRequest, HTTPVerb, Response}
 
 import scala.concurrent.Future
 
@@ -20,9 +20,9 @@ object BasicHTTP {
 
   trait EmptyVerb extends HTTPVerb {
 
-    def send() = client connect BasicRequest(method = method, address = address, headers = headers, params = params)
+    def send = client connect BasicRequest(method = method, address = address, headers = headers, params = params)
 
-    def ! = send()
+    def ! = send
   }
 
 
@@ -36,8 +36,8 @@ object BasicHTTP {
       val encode: (String) => String = URLEncoder.encode(_, client.requestBodyCharset)
 
       val encodedPayload = form
-        .map(h => (encode(h._1), encode(h._2)))
-        .map(h => h._1 + "=" + h._2)
+        .map(e => (encode(e._1), encode(e._2)))
+        .map(e => e._1 + "=" + e._2)
         .mkString("&")
 
       send(encodedPayload)

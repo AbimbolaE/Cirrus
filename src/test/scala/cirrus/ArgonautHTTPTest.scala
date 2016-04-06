@@ -1,17 +1,17 @@
-package com.godis.cirrus
+package cirrus
 
-import com.godis.cirrus.core.{BasicClient, FailedRequest}
+import internal.{BasicClient, FailedRequest}
 
 import scala.language.postfixOps
 
-//import com.godis.cirrus.Defaults._
-import com.godis.cirrus.Protocol._
-import com.godis.cirrus.client.SprayHTTP.POST
+//import cirrus.Defaults._
+import cirrus.client.ArgonautHTTP.POST
+import argonaut.Argonaut._
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-object SprayHTTPTest extends App {
+object ArgonautHTTPTest extends App {
 
   implicit val client = BasicClient
     .Builder()
@@ -22,9 +22,11 @@ object SprayHTTPTest extends App {
     .withRequestBodyCharset("UTF-8")
     .build()
 
+  implicit val codec = casecodec4(User.apply, User.unapply)("username", "gender", "mobile", "email")
+
   val user = User("James", "F", "+234808888330", "james@gmail.com")
 
-  val post = POST[List[User]]("http://demo6556920.mockable.io/users") withParam("foo" -> "bar")
+  val post = POST[List[User]]("https://demo7281011.mockable.io/user") withParam("foo" -> "bar")
 
   try {
 
