@@ -2,7 +2,7 @@ package cirrus.internal
 
 import java.net.{HttpURLConnection, URL}
 
-import cirrus.Defaults.ClientConfig._
+import cirrus.internal.ClientConfig._
 
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsScalaMapConverter}
 import scala.concurrent.{ExecutionContext, Future, Promise}

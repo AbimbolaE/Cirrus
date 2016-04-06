@@ -1,8 +1,8 @@
-package cirrus.client
+package cirrus.clients
 
 import argonaut.Argonaut._
 import argonaut._
-import cirrus.Defaults.Headers._
+import cirrus.internal.Headers._
 import cirrus.internal.{BasicClient, HTTPVerb, Response}
 
 import scala.concurrent.Future
@@ -15,10 +15,10 @@ object ArgonautHTTP {
   case class GET[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient)
     extends EmptyArgonautVerb[T]
 
-  case class POST[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient)
+  case class PUT[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient)
     extends LoadedArgonautVerb[T]
 
-  case class PUT[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient)
+  case class POST[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient)
     extends LoadedArgonautVerb[T]
 
   case class DELETE[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient)
@@ -37,7 +37,7 @@ object ArgonautHTTP {
 
       verb withHeaders this.headers
       verb withHeader `Accept` -> `application/json`
-      verb.send map JSONBuilder.usingArgonaut[T]
+      verb.send map ResponseBuilder.asArgonaut[T]
     }
 
     def ! = send
@@ -58,7 +58,7 @@ object ArgonautHTTP {
 
       verb withHeaders this.headers
       verb withHeader `Content-Type` -> `application/json` withHeader `Accept` -> `application/json`
-      verb send content map JSONBuilder.usingArgonaut[T]
+      verb send content map ResponseBuilder.asArgonaut[T]
     }
 
     def ![F: EncodeJson](payload: F) = send[F](payload)

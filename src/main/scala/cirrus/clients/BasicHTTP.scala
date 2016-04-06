@@ -1,21 +1,31 @@
-package cirrus.client
+package cirrus.clients
 
 import java.net.URLEncoder
 
-import cirrus.Defaults.Headers._
+import cirrus.internal.Headers._
 import cirrus.internal.{BasicClient, BasicRequest, HTTPVerb, Response}
 
 import scala.concurrent.Future
 
 object BasicHTTP {
 
-  case class GET(address: String)(implicit val client: BasicClient) extends EmptyVerb
+  case class HEAD(address: String)(implicit val client: BasicClient) extends EmptyVerb
 
-  case class POST(address: String)(implicit val client: BasicClient) extends LoadedVerb
+  case class GET(address: String)(implicit val client: BasicClient) extends EmptyVerb
 
   case class PUT(address: String)(implicit val client: BasicClient) extends LoadedVerb
 
+  case class POST(address: String)(implicit val client: BasicClient) extends LoadedVerb
+
   case class DELETE(address: String)(implicit val client: BasicClient) extends EmptyVerb
+
+
+  trait VoidVerb extends EmptyVerb {
+
+    import scala.concurrent.ExecutionContext.Implicits.global
+
+    override def send: Future[Response] = super.send map ResponseBuilder.asEmpty
+  }
 
 
   trait EmptyVerb extends HTTPVerb {

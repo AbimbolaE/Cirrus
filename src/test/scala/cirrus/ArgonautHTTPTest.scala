@@ -1,26 +1,17 @@
 package cirrus
 
-import internal.{BasicClient, FailedRequest}
+import cirrus.internal.{BasicClient, FailedRequest}
 
 import scala.language.postfixOps
 
-//import cirrus.Defaults._
-import cirrus.client.ArgonautHTTP.POST
+import cirrus.internal.Implicits.client
+import cirrus.clients.ArgonautHTTP.POST
 import argonaut.Argonaut._
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
 object ArgonautHTTPTest extends App {
-
-  implicit val client = BasicClient
-    .Builder()
-    .withDefaultHeaders(List(
-      "Content-Type" -> "application/json",
-      "Accept" -> "application/json"
-    ))
-    .withRequestBodyCharset("UTF-8")
-    .build()
 
   implicit val codec = casecodec4(User.apply, User.unapply)("username", "gender", "mobile", "email")
 

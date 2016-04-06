@@ -1,28 +1,37 @@
 package cirrus
 
 import argonaut.DecodeJson
-import internal.{BasicResponse, Response}
+import cirrus.internal.{BasicResponse, Response}
 import spray.json.JsonReader
 
 /**
  * Created by Abim on 31/03/2016.
  */
 
-package object client {
+package object clients {
 
-  object JSONBuilder {
+  object ResponseBuilder {
 
-    def usingSpray[T: JsonReader](response: Response) = {
+    def asEmpty(response: Response) = EmptyResponse(response.statusCode, response.headers)
+
+    def asSpray[T: JsonReader](response: Response) = {
 
       val basicResponse = response.asInstanceOf[BasicResponse]
       SprayResponse[T](basicResponse.statusCode, basicResponse.headers, basicResponse.body)
     }
 
-    def usingArgonaut[T: DecodeJson](response: Response) = {
+    def asArgonaut[T: DecodeJson](response: Response) = {
 
       val basicResponse = response.asInstanceOf[BasicResponse]
       ArgonautResponse[T](basicResponse.statusCode, basicResponse.headers, basicResponse.body)
     }
+  }
+
+  case class EmptyResponse(statusCode: Int, headers: Map[String, String])
+    extends Response {
+
+    override type Content = None.type
+    override val body = None
   }
 
   case class SprayResponse[T: JsonReader](statusCode: Int, headers: Map[String, String], rawBody: String)

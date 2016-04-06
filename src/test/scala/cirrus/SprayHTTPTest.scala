@@ -1,12 +1,12 @@
 package cirrus
 
-import internal.{BasicClient, FailedRequest}
+import cirrus.internal.{BasicClient, FailedRequest}
 
 import scala.language.postfixOps
 
-//import cirrus.Defaults._
+//import cirrus.internal._
 import cirrus.Protocol._
-import cirrus.client.SprayHTTP.POST
+import cirrus.clients.SprayHTTP.POST
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -24,7 +24,7 @@ object SprayHTTPTest extends App {
 
   val user = User("James", "F", "+234808888330", "james@gmail.com")
 
-  val post = POST[List[User]]("http://demo6556920.mockable.io/users") withParam("foo" -> "bar")
+  val post = POST[List[User]]("http://demo6556920.mockable.io/users2") withParam("foo" -> "bar")
 
   try {
 

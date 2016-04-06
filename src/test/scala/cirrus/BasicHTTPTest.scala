@@ -1,7 +1,7 @@
 package cirrus
 
-import cirrus.client.BasicHTTP.{GET, POST}
-import internal.{BasicClient, FailedRequest}
+import cirrus.clients.BasicHTTP.{HEAD, GET, POST}
+import cirrus.internal.{BasicClient, FailedRequest}
 
 import scala.concurrent.{ExecutionContext, Await}
 import scala.concurrent.duration._
@@ -40,4 +40,7 @@ object BasicHTTPTest extends App {
 
   Console println Await.result(post send creds map { _.headers }, 10 seconds)
 
+  val head = HEAD("https://www.google.com")
+
+  Console println Await.result(head.send map { _.headers }, 10 seconds)
 }
