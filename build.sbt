@@ -12,7 +12,8 @@ libraryDependencies ++= Seq(
   "io.argonaut" %% "argonaut" % "6.1" % "provided",
   "io.spray" %%  "spray-json" % "1.3.2" % "provided",
 
-  "org.specs2" %% "specs2-core" % "3.7" % Test
+  "org.specs2" %% "specs2-core" % "3.7" % Test,
+  "com.github.tomakehurst" % "wiremock" % "1.57" % Test
 )
 
 dependencyOverrides ++= Set(

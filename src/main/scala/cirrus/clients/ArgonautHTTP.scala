@@ -3,9 +3,7 @@ package cirrus.clients
 import argonaut.Argonaut._
 import argonaut._
 import cirrus.internal.Headers._
-import cirrus.internal.{BasicClient, HTTPVerb, Response}
-
-import scala.concurrent.Future
+import cirrus.internal.{BasicClient, HTTPVerb}
 
 /**
  * Created by Abim on 30/03/2016.
@@ -29,7 +27,7 @@ object ArgonautHTTP {
 
     implicit val decoder: DecodeJson[T]
 
-    def send: Future[Response] = {
+    def send = {
 
       implicit val ec = client.ec
 
@@ -39,8 +37,6 @@ object ArgonautHTTP {
       verb withHeader `Accept` -> `application/json`
       verb.send map ResponseBuilder.asArgonaut[T]
     }
-
-    def ! = send
   }
 
 
@@ -48,7 +44,7 @@ object ArgonautHTTP {
 
     implicit val decoder: DecodeJson[T]
 
-    def send[F: EncodeJson](payload: F): Future[Response] = {
+    def send[F: EncodeJson](payload: F) = {
 
       implicit val ec = client.ec
 
@@ -60,7 +56,5 @@ object ArgonautHTTP {
       verb withHeader `Content-Type` -> `application/json` withHeader `Accept` -> `application/json`
       verb send content map ResponseBuilder.asArgonaut[T]
     }
-
-    def ![F: EncodeJson](payload: F) = send[F](payload)
   }
 }

@@ -35,8 +35,6 @@ object SprayHTTP {
       verb withHeader `Accept` -> `application/json`
       verb.send map ResponseBuilder.asSpray[T]
     }
-
-    def ! = send
   }
 
 
@@ -44,7 +42,7 @@ object SprayHTTP {
 
     implicit val reader: JsonReader[T]
 
-    def send[F : JsonWriter](payload: F): Future[Response] = {
+    def send[F : JsonWriter](payload: F) = {
 
       implicit val ec = client.ec
 
@@ -56,7 +54,5 @@ object SprayHTTP {
       verb withHeader `Content-Type` -> `application/json` withHeader `Accept` -> `application/json`
       verb send content map ResponseBuilder.asSpray[T]
     }
-
-    def ![F : JsonWriter](payload: F) = send[F](payload)
   }
 }

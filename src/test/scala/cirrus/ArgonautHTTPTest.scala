@@ -22,7 +22,7 @@ object ArgonautHTTPTest extends App {
   try {
 
     val start = System.currentTimeMillis()
-    val response = Await.result(post ! user, 3 seconds)
+    val response = Await.result(post send user, 3 seconds)
     println(s"Request took ${System.currentTimeMillis - start}ms")
 
     println(s"Content: ${response.body}")

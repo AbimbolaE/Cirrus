@@ -3,7 +3,7 @@ package cirrus.clients
 import java.net.URLEncoder
 
 import cirrus.internal.Headers._
-import cirrus.internal.{BasicClient, BasicRequest, HTTPVerb, Response}
+import cirrus.internal._
 
 import scala.concurrent.Future
 
@@ -20,27 +20,32 @@ object BasicHTTP {
   case class DELETE(address: String)(implicit val client: BasicClient) extends EmptyVerb
 
 
-  trait VoidVerb extends EmptyVerb {
+  trait VoidVerb extends HTTPVerb {
 
-    import scala.concurrent.ExecutionContext.Implicits.global
+    implicit val ec = client.ec
 
-    override def send: Future[Response] = super.send map ResponseBuilder.asEmpty
+    def send = client.connect(BasicRequest(method = method, address = address, headers = headers, params = params))
+      .map(_.asInstanceOf[BasicResponse]) map ResponseBuilder.asEmpty
   }
 
 
   trait EmptyVerb extends HTTPVerb {
 
-    def send = client connect BasicRequest(method = method, address = address, headers = headers, params = params)
+    implicit val ec = client.ec
 
-    def ! = send
+    def send = client.connect(BasicRequest(method = method, address = address, headers = headers, params = params))
+                  .map(_.asInstanceOf[BasicResponse])
   }
 
 
   trait LoadedVerb extends HTTPVerb {
 
-    def send(payload: String) = client connect BasicRequest(method, address, headers, params, Some(payload))
+    implicit val ec = client.ec
 
-    def send(form: Map[String, String]): Future[Response] = {
+    def send(payload: String) = client.connect(BasicRequest(method, address, headers, params, Some(payload)))
+                  .map(_.asInstanceOf[BasicResponse])
+
+    def send(form: Map[String, String]): Future[BasicResponse] = {
       withHeader(`Content-Type` -> `application/x-www-form-urlencoded`)
 
       val encode: (String) => String = URLEncoder.encode(_, client.requestBodyCharset)
@@ -52,9 +57,5 @@ object BasicHTTP {
 
       send(encodedPayload)
     }
-
-    def !(payload: String) = send(payload)
-
-    def !(form: Map[String, String]) = send(form)
   }
 }
