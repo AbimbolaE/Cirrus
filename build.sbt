@@ -1,20 +1,20 @@
 name := "cirrus"
 
-version := "0.0.2-SNAPSHOT"
+version := "1.2.0-SNAPSHOT"
 
 organization := "com.github.godis"
 
 scalaVersion := "2.11.8"
 
 libraryDependencies ++= Seq(
-//  "io.argonaut" %% "argonaut" % "6.1" exclude("org.scala-lang", "scala-library"),
-//  "io.spray" %% "spray-json" % "1.3.2" exclude("org.scala-lang", "scala-library")
-  "io.argonaut" %% "argonaut" % "6.1" % "provided" exclude("org.scala-lang", "scala-library"),
-  "io.spray" %%  "spray-json" % "1.3.2" % "provided" exclude("org.scala-lang", "scala-library")
-)
-
-libraryDependencies ++= Seq(
-  "org.scala-lang" % "scala-library" % "2.11.8" % "provided"
+  "io.argonaut" %% "argonaut" % "6.1" % "provided" excludeAll(
+    ExclusionRule(organization = "org.scala-lang", name = "scala-library"),
+    ExclusionRule(organization = "org.scala-lang", name = "scala-reflect"),
+    ExclusionRule(organization = "org.scala-lang.modules", name = "scala-xml_2.11"),
+    ExclusionRule(organization = "org.scala-lang.modules", name = "scala-parser-combinators_2.11")
+  ),
+  "io.spray" %%  "spray-json" % "1.3.2" % "provided" excludeAll
+    ExclusionRule(organization = "org.scala-lang", name = "scala-library")
 )
 
 publishMavenStyle := true

@@ -4,10 +4,6 @@ import argonaut.DecodeJson
 import cirrus.internal.{BasicResponse, Response}
 import spray.json.JsonReader
 
-/**
- * Created by Abim on 31/03/2016.
- */
-
 package object clients {
 
   object ResponseBuilder {
