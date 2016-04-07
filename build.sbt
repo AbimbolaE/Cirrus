@@ -6,15 +6,20 @@ organization := "com.github.godis"
 
 scalaVersion := "2.11.8"
 
+conflictManager := ConflictManager.strict
+
 libraryDependencies ++= Seq(
-  "io.argonaut" %% "argonaut" % "6.1" % "provided" excludeAll(
-    ExclusionRule(organization = "org.scala-lang", name = "scala-library"),
-    ExclusionRule(organization = "org.scala-lang", name = "scala-reflect"),
-    ExclusionRule(organization = "org.scala-lang.modules", name = "scala-xml_2.11"),
-    ExclusionRule(organization = "org.scala-lang.modules", name = "scala-parser-combinators_2.11")
-  ),
-  "io.spray" %%  "spray-json" % "1.3.2" % "provided" excludeAll
-    ExclusionRule(organization = "org.scala-lang", name = "scala-library")
+  "io.argonaut" %% "argonaut" % "6.1" % "provided",
+  "io.spray" %%  "spray-json" % "1.3.2" % "provided",
+
+  "org.specs2" %% "specs2-core" % "3.7" % Test
+)
+
+dependencyOverrides ++= Set(
+  "org.scalaz" %% "scalaz-core" % "7.2.0",
+  "org.scala-lang" % "scala-library" % "2.11.8",
+  "org.scala-lang" % "scala-reflect" % "2.11.8",
+  "org.scala-lang" % "scala-compiler" % "2.11.8"
 )
 
 publishMavenStyle := true
