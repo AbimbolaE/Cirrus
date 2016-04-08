@@ -1,9 +1,7 @@
 package cirrus.clients
 
 import argonaut.Argonaut._
-import argonaut._
 import cirrus.clients.ArgonautHTTP.{DELETE, GET, POST, PUT}
-import cirrus.internal.Implicits.client
 import cirrus.utils.{User, WireMockContext}
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
@@ -45,7 +43,7 @@ class ArgonautHTTPSpec extends Specification with WireMockContext with Execution
 
     response.statusCode === 201
     response.headers must havePair ("foo" -> "bar")
-    response.body === abim
+    response.body === Some(abim)
   }
 
 
@@ -65,7 +63,7 @@ class ArgonautHTTPSpec extends Specification with WireMockContext with Execution
 
     response.statusCode === 201
     response.headers must havePair ("foo" -> "bar")
-    response.body === abim
+    response.body === Some(abim)
   }
 
 
@@ -85,7 +83,7 @@ class ArgonautHTTPSpec extends Specification with WireMockContext with Execution
 
     response.statusCode === 201
     response.headers must havePair ("foo" -> "bar")
-    response.body === abim
+    response.body === Some(abim)
   }
 
 
@@ -104,6 +102,6 @@ class ArgonautHTTPSpec extends Specification with WireMockContext with Execution
 
     response.statusCode === 201
     response.headers must havePair ("foo" -> "bar")
-    response.body === abim
+    response.body === Some(abim)
   }
 }

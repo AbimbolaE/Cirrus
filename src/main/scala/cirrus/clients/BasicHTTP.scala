@@ -2,14 +2,14 @@ package cirrus.clients
 
 import java.net.URLEncoder
 
-import cirrus.internal.Headers._
 import cirrus.internal._
+import cirrus.{`Content-Type`, `application/x-www-form-urlencoded`}
 
 import scala.concurrent.Future
 
 object BasicHTTP {
 
-  case class HEAD(address: String)(implicit val client: Client) extends EmptyVerb
+  case class HEAD(address: String)(implicit val client: Client) extends VoidVerb
 
   case class GET(address: String)(implicit val client: Client) extends EmptyVerb
 
@@ -24,8 +24,9 @@ object BasicHTTP {
 
     implicit val ec = client.ec
 
-    def send = client.connect(BasicRequest(method = method, address = address, headers = headers, params = params))
-      .map(_.asInstanceOf[BasicResponse]) map ResponseBuilder.asEmpty
+    def send = client
+      .connect(BasicRequest(method, address, headers, params))
+      .map(asEmpty)
   }
 
 
@@ -33,8 +34,9 @@ object BasicHTTP {
 
     implicit val ec = client.ec
 
-    def send = client.connect(BasicRequest(method = method, address = address, headers = headers, params = params))
-                  .map(_.asInstanceOf[BasicResponse])
+    def send = client
+      .connect(BasicRequest(method, address, headers, params))
+      .map(asBasic)
   }
 
 
@@ -42,8 +44,9 @@ object BasicHTTP {
 
     implicit val ec = client.ec
 
-    def send(payload: String) = client.connect(BasicRequest(method, address, headers, params, Some(payload)))
-                  .map(_.asInstanceOf[BasicResponse])
+    def send(payload: String) = client
+      .connect(BasicRequest(method, address, headers, params, Some(payload)))
+      .map(asBasic)
 
     def send(form: Map[String, String]): Future[BasicResponse] = {
       withHeader(`Content-Type` -> `application/x-www-form-urlencoded`)
@@ -59,5 +62,17 @@ object BasicHTTP {
 
       send(encodedPayload)
     }
+  }
+
+
+  case class BasicResponse(statusCode: Int, headers: Map[String, String], body: String) extends Response {
+    override type Content = String
+  }
+
+  case class EmptyResponse(statusCode: Int, headers: Map[String, String])
+    extends Response {
+
+    override type Content = None.type
+    override val body = None
   }
 }

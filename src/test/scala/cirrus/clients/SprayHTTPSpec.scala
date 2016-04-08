@@ -1,7 +1,6 @@
 package cirrus.clients
 
 import cirrus.clients.SprayHTTP.{DELETE, GET, POST, PUT}
-import cirrus.internal.Implicits.client
 import cirrus.utils.{User, WireMockContext}
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._

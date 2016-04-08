@@ -1,7 +1,7 @@
 package cirrus.clients
 
-import cirrus.internal.Headers._
 import cirrus.internal.{Client, HTTPVerb, Response}
+import cirrus.{`Accept`, `Content-Type`, `application/json`}
 import spray.json._
 
 import scala.concurrent.Future
@@ -33,7 +33,7 @@ object SprayHTTP {
 
       verb withHeaders this.headers
       verb withHeader `Accept` -> `application/json`
-      verb.send map ResponseBuilder.asSpray[T]
+      verb.send map asSpray[T]
     }
   }
 
@@ -52,7 +52,17 @@ object SprayHTTP {
 
       verb withHeaders this.headers
       verb withHeader `Content-Type` -> `application/json` withHeader `Accept` -> `application/json`
-      verb send content map ResponseBuilder.asSpray[T]
+      verb send content map asSpray[T]
     }
+  }
+
+
+  case class SprayResponse[T: JsonReader](statusCode: Int, headers: Map[String, String], rawBody: String)
+    extends Response {
+
+    import spray.json._
+
+    override type Content = T
+    override lazy val body: Content = implicitly[JsonReader[T]].read(rawBody.parseJson)
   }
 }

@@ -2,12 +2,9 @@ package cirrus.clients
 
 import argonaut.Argonaut._
 import argonaut._
-import cirrus.internal.Headers._
-import cirrus.internal.{Client, HTTPVerb}
+import cirrus.internal.{Client, HTTPVerb, Response}
+import cirrus.{`Accept`, `Content-Type`, `application/json`}
 
-/**
- * Created by Abim on 30/03/2016.
- */
 object ArgonautHTTP {
   
   case class GET[T](address: String)(implicit val decoder: DecodeJson[T], val client: Client)
@@ -35,7 +32,7 @@ object ArgonautHTTP {
 
       verb withHeaders this.headers
       verb withHeader `Accept` -> `application/json`
-      verb.send map ResponseBuilder.asArgonaut[T]
+      verb.send map asArgonaut[T]
     }
   }
 
@@ -54,7 +51,18 @@ object ArgonautHTTP {
 
       verb withHeaders this.headers
       verb withHeader `Content-Type` -> `application/json` withHeader `Accept` -> `application/json`
-      verb send content map ResponseBuilder.asArgonaut[T]
+      verb send content map asArgonaut[T]
     }
+  }
+
+
+  case class ArgonautResponse[T: DecodeJson](statusCode: Int, headers: Map[String, String], rawBody: String)
+    extends Response {
+
+    import argonaut._
+    import Argonaut._
+
+    override type Content = Option[T]
+    override lazy val body: Content = rawBody.decodeOption(implicitly[DecodeJson[T]])
   }
 }

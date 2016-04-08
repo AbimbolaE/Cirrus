@@ -1,8 +1,8 @@
 package cirrus.clients
 
 import cirrus.clients.BasicHTTP._
-import cirrus.internal.Implicits.client
 import cirrus.utils.WireMockContext
+import cirrus.{client => _}
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.specs2.Specification
@@ -40,7 +40,7 @@ class BasicHTTPSpec extends Specification with WireMockContext with ExecutionEnv
 
     response.statusCode === 201
     response.headers must havePair ("foo" -> "bar")
-    response.body === ""
+    response.body === None
   }
 
 
