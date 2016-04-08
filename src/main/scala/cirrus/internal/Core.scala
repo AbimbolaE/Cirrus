@@ -32,7 +32,7 @@ trait Client {
 
 trait HTTPVerb {
 
-  implicit val client: BasicClient
+  implicit val client: Client
 
   val address: String
   val method = getClass.getSimpleName

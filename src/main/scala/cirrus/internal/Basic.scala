@@ -1,6 +1,5 @@
 package cirrus.internal
 
-import java.io.FileNotFoundException
 import java.net.{HttpURLConnection, URL}
 
 import cirrus.internal.ClientConfig._
@@ -8,8 +7,8 @@ import cirrus.internal.ClientConfig._
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsScalaMapConverter}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.io.{Codec, Source}
+import scala.util.Success
 import scala.util.control.NonFatal
-import scala.util.{Failure, Success, Try}
 
 case class BasicRequest(method: String, address: String, headers: List[(String, String)],
                         params: List[(String, String)], body: Option[String] = None) extends Request

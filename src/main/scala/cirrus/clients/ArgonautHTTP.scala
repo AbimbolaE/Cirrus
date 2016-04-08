@@ -3,23 +3,23 @@ package cirrus.clients
 import argonaut.Argonaut._
 import argonaut._
 import cirrus.internal.Headers._
-import cirrus.internal.{BasicClient, HTTPVerb}
+import cirrus.internal.{Client, HTTPVerb}
 
 /**
  * Created by Abim on 30/03/2016.
  */
 object ArgonautHTTP {
   
-  case class GET[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient)
+  case class GET[T](address: String)(implicit val decoder: DecodeJson[T], val client: Client)
     extends EmptyArgonautVerb[T]
 
-  case class PUT[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient)
+  case class PUT[T](address: String)(implicit val decoder: DecodeJson[T], val client: Client)
     extends LoadedArgonautVerb[T]
 
-  case class POST[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient)
+  case class POST[T](address: String)(implicit val decoder: DecodeJson[T], val client: Client)
     extends LoadedArgonautVerb[T]
 
-  case class DELETE[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient)
+  case class DELETE[T](address: String)(implicit val decoder: DecodeJson[T], val client: Client)
     extends EmptyArgonautVerb[T]
 
 

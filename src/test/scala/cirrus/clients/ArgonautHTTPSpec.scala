@@ -1,5 +1,7 @@
 package cirrus.clients
 
+import argonaut.Argonaut._
+import argonaut._
 import cirrus.clients.ArgonautHTTP.{DELETE, GET, POST, PUT}
 import cirrus.internal.Implicits.client
 import cirrus.utils.{User, WireMockContext}
@@ -9,8 +11,6 @@ import org.specs2.Specification
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.ThrownExpectations
 import org.specs2.specification.ExecutionEnvironment
-import argonaut._
-import Argonaut._
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -28,8 +28,6 @@ class ArgonautHTTPSpec extends Specification with WireMockContext with Execution
   """
 
   val abim = User("AbimbolaE", "male", "07831929972", "abimbolaesuruoso@gmail.com")
-
-  implicit val userCodec: CodecJson[User] = casecodec4(User.apply, User.unapply)("username", "gender", "mobile", "email")
 
 
   def `A GET request should return a valid response`(implicit ee: ExecutionEnv) = {

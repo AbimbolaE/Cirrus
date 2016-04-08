@@ -1,6 +1,6 @@
 package cirrus.clients
 
-import cirrus.clients.SprayHTTP.{DELETE, POST, PUT, GET}
+import cirrus.clients.SprayHTTP.{DELETE, GET, POST, PUT}
 import cirrus.internal.Implicits.client
 import cirrus.utils.{User, WireMockContext}
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -9,7 +9,6 @@ import org.specs2.Specification
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.ThrownExpectations
 import org.specs2.specification.ExecutionEnvironment
-import spray.json.DefaultJsonProtocol._
 import spray.json._
 
 import scala.concurrent.Await

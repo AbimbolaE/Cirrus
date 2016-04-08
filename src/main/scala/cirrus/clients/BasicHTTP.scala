@@ -9,15 +9,15 @@ import scala.concurrent.Future
 
 object BasicHTTP {
 
-  case class HEAD(address: String)(implicit val client: BasicClient) extends EmptyVerb
+  case class HEAD(address: String)(implicit val client: Client) extends EmptyVerb
 
-  case class GET(address: String)(implicit val client: BasicClient) extends EmptyVerb
+  case class GET(address: String)(implicit val client: Client) extends EmptyVerb
 
-  case class PUT(address: String)(implicit val client: BasicClient) extends LoadedVerb
+  case class PUT(address: String)(implicit val client: Client) extends LoadedVerb
 
-  case class POST(address: String)(implicit val client: BasicClient) extends LoadedVerb
+  case class POST(address: String)(implicit val client: Client) extends LoadedVerb
 
-  case class DELETE(address: String)(implicit val client: BasicClient) extends EmptyVerb
+  case class DELETE(address: String)(implicit val client: Client) extends EmptyVerb
 
 
   trait VoidVerb extends HTTPVerb {
@@ -48,7 +48,9 @@ object BasicHTTP {
     def send(form: Map[String, String]): Future[BasicResponse] = {
       withHeader(`Content-Type` -> `application/x-www-form-urlencoded`)
 
-      val encode: (String) => String = URLEncoder.encode(_, client.requestBodyCharset)
+      val basicClient = client.asInstanceOf[BasicClient]
+
+      val encode: (String) => String = URLEncoder.encode(_, basicClient.requestBodyCharset)
 
       val encodedPayload = form
         .map(e => (encode(e._1), encode(e._2)))
