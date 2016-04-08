@@ -1,5 +1,6 @@
 package cirrus.internal
 
+import java.io.FileNotFoundException
 import java.net.{HttpURLConnection, URL}
 
 import cirrus.internal.ClientConfig._
@@ -7,6 +8,7 @@ import cirrus.internal.ClientConfig._
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsScalaMapConverter}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.io.{Codec, Source}
+import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
 case class BasicRequest(method: String, address: String, headers: List[(String, String)],
@@ -22,6 +24,8 @@ case class BasicClient(requestBodyCharset: String = charset, codec: Codec = code
                       (implicit val ec: ExecutionContext = ExecutionContext.global) extends Client {
 
   override def connect(request: Request): Future[Response] = {
+
+    println(request)
 
     val promise = Promise[Response]()
 
@@ -52,26 +56,21 @@ case class BasicClient(requestBodyCharset: String = charset, codec: Codec = code
         c.getOutputStream.write(b.getBytes(requestBodyCharset))
       })
 
+      try {
+        connectionOpt foreach(_.getInputStream)
+      } catch { case ex: FileNotFoundException => () }
+
       // Generate Response
-      val responseOpt = for {
+      for {
         statusCode <- connectionOpt map (_.getResponseCode)
         headers <- connectionOpt map (_.getHeaderFields.asScala.map(e => (e._1, e._2.asScala.mkString(","))).toMap)
-        if connectionOpt.get.getErrorStream == null
-        body <- connectionOpt map (c => Source.fromInputStream(c.getInputStream)(codec).mkString)
-      } yield Success(BasicResponse(statusCode, headers, body))
+        body <- {
+          val stream = if (statusCode < 400) connectionOpt.get.getInputStream else connectionOpt.get.getErrorStream
+          Some(Source.fromInputStream(stream)(codec).mkString)
+        }
+      } yield promise complete Success(BasicResponse(statusCode, headers, body))
 
-
-      // Extract ErrorStream if necessary
-      responseOpt orElse {
-
-        val responseMessage = "\n" + Source.fromInputStream(connectionOpt.get.getErrorStream)(codec).mkString
-
-        val exception = Try(connectionOpt.get.getInputStream).recover { case ex => ex }.get.asInstanceOf[Exception]
-
-        Some(Failure(new FailedRequest(responseMessage, exception)))
-      } foreach promise.complete
-
-    } recover { case ex => promise.failure(ex)
+    } recover { case NonFatal(ex) => promise.failure(FailedRequest(ex))
     } andThen { case _ => connectionOpt.foreach(_.disconnect()) }
 
     promise.future
@@ -118,4 +117,4 @@ object BasicClient {
   }
 }
 
-case class FailedRequest(response: String, cause: Exception) extends RuntimeException(cause)
+case class FailedRequest(cause: Throwable) extends RuntimeException(cause)

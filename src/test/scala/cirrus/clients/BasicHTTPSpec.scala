@@ -72,7 +72,7 @@ class BasicHTTPSpec extends Specification with BeforeAfterAll with ExecutionEnvi
             .withHeader("foo", "bar")
             .withBody("Hi there...")))
 
-    val response = Await result(PUT("http://localhost:8080/tests") send "Hello", 5 seconds)
+    val response = Await result(PUT("http://localhost:8080/tests") send "Hell", 5 seconds)
 
     println(response)
 
@@ -94,7 +94,7 @@ class BasicHTTPSpec extends Specification with BeforeAfterAll with ExecutionEnvi
             .withHeader("foo", "bar")
             .withBody("Hi there...")))
 
-    val response = Await result(POST("http://localhost:8080/tests") send "Hell", 5 seconds)
+    val response = Await result(POST("http://localhost:8080/tests") send "Hello", 5 seconds)
 
     println(response)
 
