@@ -1,65 +1,51 @@
 package cirrus.clients
 
-import cirrus.clients.BasicHTTP._
+import cirrus.clients.SprayHTTP.{DELETE, POST, PUT, GET}
 import cirrus.internal.Implicits.client
-import cirrus.utils.WireMockContext
+import cirrus.utils.{User, WireMockContext}
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.specs2.Specification
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.ThrownExpectations
 import org.specs2.specification.ExecutionEnvironment
+import spray.json.DefaultJsonProtocol._
+import spray.json._
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class BasicHTTPSpec extends Specification with WireMockContext with ExecutionEnvironment with ThrownExpectations {
+class SprayHTTPSpec extends Specification with WireMockContext with ExecutionEnvironment with ThrownExpectations {
+
 
   def is(implicit ee: ExecutionEnv) = s2"""
 
-    The Basic HTTP features:
-      A HEAD request should return a valid response         ${ `A HEAD request should return a valid response` }
+    The Spray HTTP features:
       A GET request should return a valid response          ${ `A GET request should return a valid response` }
       A PUT request should return a valid response          ${ `A PUT request should return a valid response` }
       A POST request should return a valid response         ${ `A POST request should return a valid response` }
       A DELETE request should return a valid response       ${ `A DELETE request should return a valid response` }
   """
 
-
-  def `A HEAD request should return a valid response`(implicit ee: ExecutionEnv) = {
-
-    stubFor(
-      head(
-        urlEqualTo("/basic/tests"))
-        .willReturn(
-          aResponse()
-            .withStatus(201)
-            .withHeader("foo", "bar")))
-
-    val response = Await result(HEAD("http://localhost:8080/basic/tests") send, 5 seconds)
-
-    response.statusCode === 201
-    response.headers must havePair ("foo" -> "bar")
-    response.body === ""
-  }
+  val abim = User("AbimbolaE", "male", "07831929972", "abimbolaesuruoso@gmail.com")
 
 
   def `A GET request should return a valid response`(implicit ee: ExecutionEnv) = {
 
     stubFor(
       get(
-        urlEqualTo("/basic/tests"))
+        urlEqualTo("/spray/tests"))
         .willReturn(
           aResponse()
             .withStatus(201)
             .withHeader("foo", "bar")
-            .withBody("OK...")))
+            .withBody(abim.toJson.compactPrint)))
 
-    val response = Await result(GET("http://localhost:8080/basic/tests") send, 5 seconds)
+    val response = Await result(GET[User]("http://localhost:8080/spray/tests") send, 5 seconds)
 
     response.statusCode === 201
     response.headers must havePair ("foo" -> "bar")
-    response.body === "OK..."
+    response.body === abim
   }
 
 
@@ -67,19 +53,19 @@ class BasicHTTPSpec extends Specification with WireMockContext with ExecutionEnv
 
     stubFor(
       put(
-        urlEqualTo("/basic/tests"))
-        .withRequestBody(WireMock.matching("Hello"))
+        urlEqualTo("/spray/tests"))
+        .withRequestBody(WireMock.equalTo(abim.toJson.compactPrint))
         .willReturn(
           aResponse()
             .withStatus(201)
             .withHeader("foo", "bar")
-            .withBody("Hi there...")))
+            .withBody(abim.toJson.compactPrint)))
 
-    val response = Await result(PUT("http://localhost:8080/basic/tests") send "Hello", 5 seconds)
+    val response = Await result(PUT[User]("http://localhost:8080/spray/tests") send abim, 5 seconds)
 
     response.statusCode === 201
     response.headers must havePair ("foo" -> "bar")
-    response.body === "Hi there..."
+    response.body === abim
   }
 
 
@@ -87,19 +73,19 @@ class BasicHTTPSpec extends Specification with WireMockContext with ExecutionEnv
 
     stubFor(
       post(
-        urlEqualTo("/basic/tests"))
-        .withRequestBody(WireMock.matching("Hello"))
+        urlEqualTo("/spray/tests"))
+        .withRequestBody(WireMock.equalTo(abim.toJson.compactPrint))
         .willReturn(
           aResponse()
             .withStatus(201)
             .withHeader("foo", "bar")
-            .withBody("Hi there...")))
+            .withBody(abim.toJson.compactPrint)))
 
-    val response = Await result(POST("http://localhost:8080/basic/tests") send "Hello", 5 seconds)
+    val response = Await result(POST[User]("http://localhost:8080/spray/tests") send abim, 5 seconds)
 
     response.statusCode === 201
     response.headers must havePair ("foo" -> "bar")
-    response.body === "Hi there..."
+    response.body === abim
   }
 
 
@@ -107,17 +93,17 @@ class BasicHTTPSpec extends Specification with WireMockContext with ExecutionEnv
 
     stubFor(
       delete(
-        urlEqualTo("/basic/tests"))
+        urlEqualTo("/spray/tests"))
         .willReturn(
           aResponse()
             .withStatus(201)
             .withHeader("foo", "bar")
-            .withBody("OK...")))
+            .withBody(abim.toJson.compactPrint)))
 
-    val response = Await result(DELETE("http://localhost:8080/basic/tests") send, 5 seconds)
+    val response = Await result(DELETE[User]("http://localhost:8080/spray/tests") send, 5 seconds)
 
     response.statusCode === 201
     response.headers must havePair ("foo" -> "bar")
-    response.body === "OK..."
+    response.body === abim
   }
 }

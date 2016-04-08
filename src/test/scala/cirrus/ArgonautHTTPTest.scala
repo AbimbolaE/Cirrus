@@ -1,6 +1,7 @@
 package cirrus
 
 import cirrus.internal.{BasicClient, FailedRequest}
+import cirrus.utils.User
 
 import scala.language.postfixOps
 

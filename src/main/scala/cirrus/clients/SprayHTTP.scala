@@ -42,7 +42,7 @@ object SprayHTTP {
 
     implicit val reader: JsonReader[T]
 
-    def send[F : JsonWriter](payload: F) = {
+    def send[F: JsonWriter](payload: F) = {
 
       implicit val ec = client.ec
 

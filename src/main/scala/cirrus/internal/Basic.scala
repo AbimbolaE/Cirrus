@@ -25,8 +25,6 @@ case class BasicClient(requestBodyCharset: String = charset, codec: Codec = code
 
   override def connect(request: Request): Future[Response] = {
 
-    println(request)
-
     val promise = Promise[Response]()
 
     var connectionOpt: Option[HttpURLConnection] = None
@@ -56,17 +54,13 @@ case class BasicClient(requestBodyCharset: String = charset, codec: Codec = code
         c.getOutputStream.write(b.getBytes(requestBodyCharset))
       })
 
-      try {
-        connectionOpt foreach(_.getInputStream)
-      } catch { case ex: FileNotFoundException => () }
-
       // Generate Response
       for {
         statusCode <- connectionOpt map (_.getResponseCode)
         headers <- connectionOpt map (_.getHeaderFields.asScala.map(e => (e._1, e._2.asScala.mkString(","))).toMap)
         body <- {
           val stream = if (statusCode < 400) connectionOpt.get.getInputStream else connectionOpt.get.getErrorStream
-          Some(Source.fromInputStream(stream)(codec).mkString)
+          Option(stream) map (Source.fromInputStream(_)(codec).mkString) orElse Some("")
         }
       } yield promise complete Success(BasicResponse(statusCode, headers, body))
 
