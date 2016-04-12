@@ -1,13 +1,12 @@
 package cirrus
 
-import cirrus.clients.{ArgonautHTTP, SprayHTTP, BasicHTTP}
+import cirrus.clients.ArgonautHTTP
 import cirrus.internal.Response
 import cirrus.utils.User
 import cirrus.utils.User._
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.xml.Elem
 
 object CirrusExample extends App {
 

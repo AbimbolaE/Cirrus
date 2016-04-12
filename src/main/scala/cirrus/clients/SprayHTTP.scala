@@ -4,28 +4,22 @@ import cirrus.internal.{Client, HTTPVerb, Response}
 import cirrus.{`Accept`, `Content-Type`, `application/json`}
 import spray.json._
 
-import scala.concurrent.Future
-
 object SprayHTTP {
 
-  case class GET[T](address: String)(implicit val reader: JsonReader[T], val client: Client)
-    extends EmptySprayVerb[T]
+  case class GET[T](address: String)(implicit val reader: JsonReader[T], val client: Client) extends EmptySprayVerb[T]
 
-  case class PUT[T](address: String)(implicit val reader: JsonReader[T], val client: Client)
-    extends LoadedSprayVerb[T]
+  case class PUT[T](address: String)(implicit val reader: JsonReader[T], val client: Client) extends LoadedSprayVerb[T]
 
-  case class POST[T](address: String)(implicit val reader: JsonReader[T], val client: Client)
-    extends LoadedSprayVerb[T]
+  case class POST[T](address: String)(implicit val reader: JsonReader[T], val client: Client) extends LoadedSprayVerb[T]
 
-  case class DELETE[T](address: String)(implicit val reader: JsonReader[T], val client: Client)
-    extends EmptySprayVerb[T]
+  case class DELETE[T](address: String)(implicit val reader: JsonReader[T], val client: Client) extends EmptySprayVerb[T]
 
 
   trait EmptySprayVerb[T] extends HTTPVerb {
 
     implicit val reader: JsonReader[T]
 
-    def send: Future[Response] = {
+    def send = {
 
       implicit val ec = client.ec
 

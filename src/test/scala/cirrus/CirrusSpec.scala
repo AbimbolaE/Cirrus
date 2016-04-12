@@ -1,6 +1,7 @@
 package cirrus
 
-import cirrus.clients.{ArgonautHTTP, BasicHTTP, SprayHTTP}
+import cirrus.clients.{ArgonautHTTP, BasicHTTP, PlayHTTP, SprayHTTP}
+import cirrus.utils.User._
 import cirrus.utils.{User, WireMockContext}
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
@@ -8,6 +9,8 @@ import org.specs2.Specification
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.ThrownExpectations
 import org.specs2.specification.ExecutionEnvironment
+import play.api.libs.json.JsSuccess
+import play.api.libs.json.Json._
 import spray.json._
 
 class CirrusSpec extends Specification with WireMockContext with ExecutionEnvironment with ThrownExpectations {
@@ -30,6 +33,11 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
       An Argonaut PUT request should return a valid body      ${ `An Argonaut PUT request should return a valid body` }
       An Argonaut POST request should return a valid body     ${ `An Argonaut POST request should return a valid body` }
       An Argonaut DELETE request should return a valid body   ${ `An Argonaut DELETE request should return a valid body` }
+
+      An Play GET request should return a valid body          ${ `An Play GET request should return a valid body` }
+      An Play PUT request should return a valid body          ${ `An Play PUT request should return a valid body` }
+      An Play POST request should return a valid body         ${ `An Play POST request should return a valid body` }
+      An Play DELETE request should return a valid body       ${ `An Play DELETE request should return a valid body` }
   """
 
   val abim = User("AbimbolaE", "male", "07831929972", "abimbolaesuruoso@gmail.com")
@@ -219,5 +227,63 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
             .withBody(abim.toJson.compactPrint)))
 
     Cirrus(ArgonautHTTP.DELETE[User]("http://localhost:8080/argonaut/tests")) must be_==(Some(abim)).await
+  }
+
+
+  def `An Play GET request should return a valid body`(implicit ee: ExecutionEnv) = {
+
+    stubFor(
+      get(
+        urlEqualTo("/play/tests"))
+        .willReturn(
+          aResponse()
+            .withStatus(201)
+            .withBody(stringify(userPlayFormat.writes(abim)))))
+
+    Cirrus(PlayHTTP.GET[User]("http://localhost:8080/play/tests")) must be_==(JsSuccess(abim)).await
+  }
+
+
+  def `An Play PUT request should return a valid body`(implicit ee: ExecutionEnv) = {
+
+    stubFor(
+      put(
+        urlEqualTo("/play/tests"))
+        .withRequestBody(WireMock.equalTo(stringify(userPlayFormat.writes(abim))))
+        .willReturn(
+          aResponse()
+            .withStatus(201)
+            .withBody(stringify(userPlayFormat.writes(abim)))))
+
+    Cirrus(PlayHTTP.PUT[User]("http://localhost:8080/play/tests") ! abim) must be_==(JsSuccess(abim)).await
+  }
+
+
+  def `An Play POST request should return a valid body`(implicit ee: ExecutionEnv) = {
+
+    stubFor(
+      post(
+        urlEqualTo("/play/tests"))
+        .withRequestBody(WireMock.equalTo(stringify(userPlayFormat.writes(abim))))
+        .willReturn(
+          aResponse()
+            .withStatus(201)
+            .withBody(stringify(userPlayFormat.writes(abim)))))
+
+    Cirrus(PlayHTTP.POST[User]("http://localhost:8080/play/tests") ! abim) must be_==(JsSuccess(abim)).await
+  }
+
+
+  def `An Play DELETE request should return a valid body`(implicit ee: ExecutionEnv) = {
+
+    stubFor(
+      delete(
+        urlEqualTo("/play/tests"))
+        .willReturn(
+          aResponse()
+            .withStatus(201)
+            .withBody(stringify(userPlayFormat.writes(abim)))))
+
+    Cirrus(PlayHTTP.DELETE[User]("http://localhost:8080/play/tests")) must be_==(JsSuccess(abim)).await
   }
 }
