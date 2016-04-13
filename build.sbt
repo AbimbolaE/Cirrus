@@ -1,6 +1,6 @@
 name := "cirrus"
 
-version := "1.3.0"
+version := "1.4.0"
 
 organization := "com.github.godis"
 
@@ -27,8 +27,8 @@ dependencyOverrides ++= Set(
   "org.scala-lang" % "scala-reflect" % "2.11.8",
   "org.scala-lang" % "scala-compiler" % "2.11.8",
   "com.fasterxml.jackson.core" % "jackson-core" % "2.7.1",
-  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.7.1",
-  "com.fasterxml.jackson.core" % "jackson-databind" % "2.7.1"
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.7.1",
+  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.7.1"
 )
 
 publishMavenStyle := true
