@@ -1,21 +1,21 @@
 package cirrus.clients
 
-import cirrus.internal.{BasicRequest, Client, HTTPVerb, Response}
+import cirrus.internal.{BasicRequest, BasicClient, HTTPVerb, Response}
 import cirrus.{`Accept`, `Content-Type`, `application/json`}
 import play.api.libs.json.{Json, Reads, Writes}
 
 object PlayHTTP {
 
-  case class GET[T](address: String)(implicit val reads: Reads[T], val client: Client) extends EmptyPlayVerb[T]
+  case class GET[T](address: String)(implicit val reads: Reads[T], val client: BasicClient) extends EmptyVerb[T]
 
-  case class PUT[T](address: String)(implicit val reads: Reads[T], val client: Client) extends LoadedPlayVerb[T]
+  case class PUT[T](address: String)(implicit val reads: Reads[T], val client: BasicClient) extends LoadedVerb[T]
 
-  case class POST[T](address: String)(implicit val reads: Reads[T], val client: Client) extends LoadedPlayVerb[T]
+  case class POST[T](address: String)(implicit val reads: Reads[T], val client: BasicClient) extends LoadedVerb[T]
 
-  case class DELETE[T](address: String)(implicit val reads: Reads[T], val client: Client) extends EmptyPlayVerb[T]
+  case class DELETE[T](address: String)(implicit val reads: Reads[T], val client: BasicClient) extends EmptyVerb[T]
 
 
-  trait EmptyPlayVerb[T] extends HTTPVerb {
+  trait EmptyVerb[T] extends HTTPVerb {
 
     implicit val reads: Reads[T]
 
@@ -32,7 +32,7 @@ object PlayHTTP {
   }
 
 
-  trait LoadedPlayVerb[T] extends HTTPVerb {
+  trait LoadedVerb[T] extends HTTPVerb {
 
     implicit val reads: Reads[T]
 

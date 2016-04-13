@@ -24,9 +24,11 @@ trait Response {
 
 trait Client {
 
+  type ClientResponse <: Response
+
   implicit val ec: ExecutionContext
 
-  def connect(request: Request): Future[Response]
+  def connect(request: Request): Future[ClientResponse]
 }
 
 

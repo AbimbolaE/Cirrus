@@ -34,10 +34,10 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
       An Argonaut POST request should return a valid body     ${ `An Argonaut POST request should return a valid body` }
       An Argonaut DELETE request should return a valid body   ${ `An Argonaut DELETE request should return a valid body` }
 
-      An Play GET request should return a valid body          ${ `An Play GET request should return a valid body` }
-      An Play PUT request should return a valid body          ${ `An Play PUT request should return a valid body` }
-      An Play POST request should return a valid body         ${ `An Play POST request should return a valid body` }
-      An Play DELETE request should return a valid body       ${ `An Play DELETE request should return a valid body` }
+      A Play GET request should return a valid body          ${ `A Play GET request should return a valid body` }
+      A Play PUT request should return a valid body          ${ `A Play PUT request should return a valid body` }
+      A Play POST request should return a valid body         ${ `A Play POST request should return a valid body` }
+      A Play DELETE request should return a valid body       ${ `A Play DELETE request should return a valid body` }
   """
 
   val abim = User("AbimbolaE", "male", "07831929972", "abimbolaesuruoso@gmail.com")
@@ -230,7 +230,7 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
   }
 
 
-  def `An Play GET request should return a valid body`(implicit ee: ExecutionEnv) = {
+  def `A Play GET request should return a valid body`(implicit ee: ExecutionEnv) = {
 
     stubFor(
       get(
@@ -244,7 +244,7 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
   }
 
 
-  def `An Play PUT request should return a valid body`(implicit ee: ExecutionEnv) = {
+  def `A Play PUT request should return a valid body`(implicit ee: ExecutionEnv) = {
 
     stubFor(
       put(
@@ -259,7 +259,7 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
   }
 
 
-  def `An Play POST request should return a valid body`(implicit ee: ExecutionEnv) = {
+  def `A Play POST request should return a valid body`(implicit ee: ExecutionEnv) = {
 
     stubFor(
       post(
@@ -274,7 +274,7 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
   }
 
 
-  def `An Play DELETE request should return a valid body`(implicit ee: ExecutionEnv) = {
+  def `A Play DELETE request should return a valid body`(implicit ee: ExecutionEnv) = {
 
     stubFor(
       delete(

@@ -9,15 +9,15 @@ import scala.concurrent.Future
 
 object BasicHTTP {
 
-  case class HEAD(address: String)(implicit val client: Client) extends VoidVerb
+  case class HEAD(address: String)(implicit val client: BasicClient) extends VoidVerb
 
-  case class GET(address: String)(implicit val client: Client) extends EmptyVerb
+  case class GET(address: String)(implicit val client: BasicClient) extends EmptyVerb
 
-  case class PUT(address: String)(implicit val client: Client) extends LoadedVerb
+  case class PUT(address: String)(implicit val client: BasicClient) extends LoadedVerb
 
-  case class POST(address: String)(implicit val client: Client) extends LoadedVerb
+  case class POST(address: String)(implicit val client: BasicClient) extends LoadedVerb
 
-  case class DELETE(address: String)(implicit val client: Client) extends EmptyVerb
+  case class DELETE(address: String)(implicit val client: BasicClient) extends EmptyVerb
 
 
   trait VoidVerb extends HTTPVerb {

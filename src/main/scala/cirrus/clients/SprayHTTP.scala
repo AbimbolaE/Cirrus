@@ -1,21 +1,21 @@
 package cirrus.clients
 
-import cirrus.internal.{Client, HTTPVerb, Response}
+import cirrus.internal.{BasicClient, HTTPVerb, Response}
 import cirrus.{`Accept`, `Content-Type`, `application/json`}
 import spray.json._
 
 object SprayHTTP {
 
-  case class GET[T](address: String)(implicit val reader: JsonReader[T], val client: Client) extends EmptySprayVerb[T]
+  case class GET[T](address: String)(implicit val reader: JsonReader[T], val client: BasicClient) extends EmptyVerb[T]
 
-  case class PUT[T](address: String)(implicit val reader: JsonReader[T], val client: Client) extends LoadedSprayVerb[T]
+  case class PUT[T](address: String)(implicit val reader: JsonReader[T], val client: BasicClient) extends LoadedVerb[T]
 
-  case class POST[T](address: String)(implicit val reader: JsonReader[T], val client: Client) extends LoadedSprayVerb[T]
+  case class POST[T](address: String)(implicit val reader: JsonReader[T], val client: BasicClient) extends LoadedVerb[T]
 
-  case class DELETE[T](address: String)(implicit val reader: JsonReader[T], val client: Client) extends EmptySprayVerb[T]
+  case class DELETE[T](address: String)(implicit val reader: JsonReader[T], val client: BasicClient) extends EmptyVerb[T]
 
 
-  trait EmptySprayVerb[T] extends HTTPVerb {
+  trait EmptyVerb[T] extends HTTPVerb {
 
     implicit val reader: JsonReader[T]
 
@@ -32,7 +32,7 @@ object SprayHTTP {
   }
 
 
-  trait LoadedSprayVerb[T] extends HTTPVerb {
+  trait LoadedVerb[T] extends HTTPVerb {
 
     implicit val reader: JsonReader[T]
 

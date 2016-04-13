@@ -2,25 +2,21 @@ package cirrus.clients
 
 import argonaut.Argonaut._
 import argonaut._
-import cirrus.internal.{Client, HTTPVerb, Response}
+import cirrus.internal.{BasicClient, Client, HTTPVerb, Response}
 import cirrus.{`Accept`, `Content-Type`, `application/json`}
 
 object ArgonautHTTP {
   
-  case class GET[T](address: String)(implicit val decoder: DecodeJson[T], val client: Client)
-    extends EmptyArgonautVerb[T]
+  case class GET[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient) extends EmptyVerb[T]
 
-  case class PUT[T](address: String)(implicit val decoder: DecodeJson[T], val client: Client)
-    extends LoadedArgonautVerb[T]
+  case class PUT[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient) extends LoadedVerb[T]
 
-  case class POST[T](address: String)(implicit val decoder: DecodeJson[T], val client: Client)
-    extends LoadedArgonautVerb[T]
+  case class POST[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient) extends LoadedVerb[T]
 
-  case class DELETE[T](address: String)(implicit val decoder: DecodeJson[T], val client: Client)
-    extends EmptyArgonautVerb[T]
+  case class DELETE[T](address: String)(implicit val decoder: DecodeJson[T], val client: BasicClient) extends EmptyVerb[T]
 
 
-  trait EmptyArgonautVerb[T] extends HTTPVerb {
+  trait EmptyVerb[T] extends HTTPVerb {
 
     implicit val decoder: DecodeJson[T]
 
@@ -37,7 +33,7 @@ object ArgonautHTTP {
   }
 
 
-  trait LoadedArgonautVerb[T] extends HTTPVerb {
+  trait LoadedVerb[T] extends HTTPVerb {
 
     implicit val decoder: DecodeJson[T]
 

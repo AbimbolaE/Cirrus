@@ -18,9 +18,11 @@ case class BasicClient(requestBodyCharset: String = charset, codec: Codec = code
                        tweaks: Seq[(HttpURLConnection) => Unit] = tweaks)
                       (implicit val ec: ExecutionContext = ExecutionContext.global) extends Client {
 
-  override def connect(request: Request): Future[Response] = {
+  override type ClientResponse = BasicResponse
 
-    val promise = Promise[Response]()
+  override def connect(request: Request) = {
+
+    val promise = Promise[BasicResponse]()
 
     var connectionOpt: Option[HttpURLConnection] = None
 
