@@ -24,9 +24,7 @@ object BasicHTTP {
 
     implicit val ec = client.ec
 
-    def send = client
-      .connect(BasicRequest(method, address, headers, params))
-      .map(asEmpty)
+    def send = client connect BasicRequest(method, address, headers, params) map asEmpty
   }
 
 
@@ -34,9 +32,7 @@ object BasicHTTP {
 
     implicit val ec = client.ec
 
-    def send = client
-      .connect(BasicRequest(method, address, headers, params))
-      .map(asBasic)
+    def send = client connect BasicRequest(method, address, headers, params) map asBasic
   }
 
 
@@ -44,11 +40,10 @@ object BasicHTTP {
 
     implicit val ec = client.ec
 
-    def send(payload: String) = client
-      .connect(BasicRequest(method, address, headers, params, Some(payload)))
-      .map(asBasic)
+    def send(payload: String) = client connect BasicRequest(method, address, headers, params, Some(payload)) map asBasic
 
     def send(form: Map[String, String]): Future[BasicResponse] = {
+
       withHeader(`Content-Type` -> `application/x-www-form-urlencoded`)
 
       val basicClient = client.asInstanceOf[BasicClient]
@@ -72,7 +67,7 @@ object BasicHTTP {
   case class EmptyResponse(statusCode: Int, headers: Map[String, String])
     extends Response {
 
-    override type Content = None.type
-    override val body = None
+    override type Content = Option[Nothing]
+    override val body: Option[Nothing] = None
   }
 }

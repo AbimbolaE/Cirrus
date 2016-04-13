@@ -63,7 +63,7 @@ case class BasicClient(requestBodyCharset: String = charset, codec: Codec = code
       } yield promise complete Success(BasicResponse(statusCode, headers, body))
 
     } recover { case NonFatal(ex) => promise failure FailedRequest(ex)
-    } andThen { case _ => connectionOpt.foreach(_.disconnect()) }
+    } andThen { case _ => connectionOpt foreach (_.disconnect()) }
 
     promise.future
   }

@@ -1,8 +1,8 @@
 package cirrus.clients
 
 import cirrus.clients.PlayHTTP.{DELETE, GET, POST, PUT}
-import cirrus.utils.User._
-import cirrus.utils.{User, WireMockContext}
+import utils.User._
+import utils.{User, WireMockContext}
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.specs2.Specification

@@ -57,6 +57,6 @@ object PlayHTTP {
     import play.api.libs.json.{JsResult, Json}
 
     override type Content = JsResult[T]
-    override lazy val body: Content = implicitly[Reads[T]].reads(Json.parse(rawBody))
+    override lazy val body = implicitly[Reads[T]].reads(Json.parse(rawBody))
   }
 }

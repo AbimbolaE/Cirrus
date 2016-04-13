@@ -1,7 +1,7 @@
 package cirrus.clients
 
 import cirrus.clients.BasicHTTP._
-import cirrus.utils.WireMockContext
+import utils.WireMockContext
 import cirrus.{client => _}
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._

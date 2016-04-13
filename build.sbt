@@ -8,7 +8,7 @@ scalaVersion := "2.11.8"
 
 fork in Test := true
 
-scalacOptions in Test ++= Seq("-Yrangepos")
+scalacOptions in Test ++= Seq("-Yrangepos", "-feature")
 
 conflictManager := ConflictManager.strict
 

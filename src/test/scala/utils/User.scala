@@ -1,4 +1,4 @@
-package cirrus.utils
+package utils
 
 import argonaut.Argonaut._
 import argonaut._

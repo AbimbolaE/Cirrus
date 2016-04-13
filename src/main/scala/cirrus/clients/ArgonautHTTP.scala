@@ -63,6 +63,6 @@ object ArgonautHTTP {
     import Argonaut._
 
     override type Content = Option[T]
-    override lazy val body: Content = rawBody.decodeOption(implicitly[DecodeJson[T]])
+    override lazy val body = rawBody.decodeOption(implicitly[DecodeJson[T]])
   }
 }

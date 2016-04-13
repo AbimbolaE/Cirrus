@@ -1,4 +1,4 @@
-package cirrus.utils
+package utils
 
 import com.github.tomakehurst.wiremock.WireMockServer
 

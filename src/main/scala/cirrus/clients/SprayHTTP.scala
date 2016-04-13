@@ -57,6 +57,6 @@ object SprayHTTP {
     import spray.json._
 
     override type Content = T
-    override lazy val body: Content = implicitly[JsonReader[T]].read(rawBody.parseJson)
+    override lazy val body = implicitly[JsonReader[T]].read(rawBody.parseJson)
   }
 }
