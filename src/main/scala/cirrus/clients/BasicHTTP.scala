@@ -24,36 +24,33 @@ object BasicHTTP {
 
     implicit val ec = client.ec
 
-    def send = client connect BasicRequest(method, address, headers, params) map asEmpty
+    override type VerbClient = BasicClient
+
+    def send = client connect BasicRequest(method, address, headers, params) flatMap (Future successful asEmpty(_))
   }
 
 
   trait EmptyVerb extends HTTPVerb {
 
-    implicit val ec = client.ec
+    override type VerbClient = BasicClient
 
-    def send = client connect BasicRequest(method, address, headers, params) map asBasic
+    def send = client connect BasicRequest(method, address, headers, params)
   }
 
 
   trait LoadedVerb extends HTTPVerb {
 
-    implicit val ec = client.ec
+    override type VerbClient = BasicClient
 
-    def send(payload: String) = client connect BasicRequest(method, address, headers, params, Some(payload)) map asBasic
+    def send(payload: String) = client connect BasicRequest(method, address, headers, params, Some(payload))
 
     def send(form: Map[String, String]): Future[BasicResponse] = {
 
-      withHeader(`Content-Type` -> `application/x-www-form-urlencoded`)
+      if (!headers.exists(_._1 == `Content-Type`)) withHeader(`Content-Type` -> `application/x-www-form-urlencoded`)
 
-      val basicClient = client.asInstanceOf[BasicClient]
+      val encode: (String) => String = URLEncoder.encode(_, client.requestBodyCharset)
 
-      val encode: (String) => String = URLEncoder.encode(_, basicClient.requestBodyCharset)
-
-      val encodedPayload = form
-        .map(e => (encode(e._1), encode(e._2)))
-        .map(e => e._1 + "=" + e._2)
-        .mkString("&")
+      val encodedPayload = form map (e => (encode(e._1), encode(e._2))) map (e => e._1 + "=" + e._2) mkString "&"
 
       send(encodedPayload)
     }

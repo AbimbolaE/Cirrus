@@ -2,8 +2,10 @@ package cirrus.clients
 
 import argonaut.Argonaut._
 import argonaut._
-import cirrus.internal.{BasicClient, Client, HTTPVerb, Response}
+import cirrus.internal._
 import cirrus.{`Accept`, `Content-Type`, `application/json`}
+
+import scala.concurrent.Future
 
 object ArgonautHTTP {
   
@@ -18,36 +20,33 @@ object ArgonautHTTP {
 
   trait EmptyVerb[T] extends HTTPVerb {
 
+    implicit val ec = client.ec
+
     implicit val decoder: DecodeJson[T]
 
-    def send = {
+    override type VerbClient = BasicClient
 
-      implicit val ec = client.ec
+    withHeader (`Accept` -> `application/json`)
 
-      val verb = if (method == "GET") BasicHTTP GET address else BasicHTTP DELETE address
-
-      verb withHeaders this.headers
-      verb withHeader `Accept` -> `application/json`
-      verb.send map asArgonaut[T]
-    }
+    def send = client connect BasicRequest(method, address, headers, params) flatMap (Future successful asArgonaut[T](_))
   }
 
 
   trait LoadedVerb[T] extends HTTPVerb {
 
+    implicit val ec = client.ec
+
     implicit val decoder: DecodeJson[T]
+
+    override type VerbClient = BasicClient
+
+    withHeader (`Accept` -> `application/json`) withHeader `Content-Type` -> `application/json`
 
     def send[F: EncodeJson](payload: F) = {
 
-      implicit val ec = client.ec
-
       val content = payload.asJson.nospaces
 
-      val verb = if (method == "POST") BasicHTTP POST address else BasicHTTP PUT address
-
-      verb withHeaders this.headers
-      verb withHeader `Content-Type` -> `application/json` withHeader `Accept` -> `application/json`
-      verb send content map asArgonaut[T]
+      client connect BasicRequest(method, address, headers, params, Some(content)) flatMap (Future successful asArgonaut[T](_))
     }
   }
 

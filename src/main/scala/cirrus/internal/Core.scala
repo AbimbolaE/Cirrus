@@ -34,7 +34,9 @@ trait Client {
 
 trait HTTPVerb extends HeaderManipulation with ParamManipulation {
 
-  implicit val client: Client
+  type VerbClient <: Client
+
+  implicit val client: VerbClient
 
   val address: String
   val method = getClass.getSimpleName

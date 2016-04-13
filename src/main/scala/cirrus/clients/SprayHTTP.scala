@@ -1,8 +1,10 @@
 package cirrus.clients
 
-import cirrus.internal.{BasicClient, HTTPVerb, Response}
+import cirrus.internal.{BasicRequest, BasicClient, HTTPVerb, Response}
 import cirrus.{`Accept`, `Content-Type`, `application/json`}
 import spray.json._
+
+import scala.concurrent.Future
 
 object SprayHTTP {
 
@@ -17,36 +19,33 @@ object SprayHTTP {
 
   trait EmptyVerb[T] extends HTTPVerb {
 
+    implicit val ec = client.ec
+
     implicit val reader: JsonReader[T]
 
-    def send = {
+    override type VerbClient = BasicClient
 
-      implicit val ec = client.ec
+    withHeader (`Accept` -> `application/json`)
 
-      val verb = if (method == "GET") BasicHTTP GET address else BasicHTTP DELETE address
-
-      verb withHeaders this.headers
-      verb withHeader `Accept` -> `application/json`
-      verb.send map asSpray[T]
-    }
+    def send = client connect BasicRequest(method, address, headers, params) flatMap (Future successful asSpray[T](_))
   }
 
 
   trait LoadedVerb[T] extends HTTPVerb {
 
+    implicit val ec = client.ec
+
     implicit val reader: JsonReader[T]
+
+    override type VerbClient = BasicClient
+
+    withHeader (`Accept` -> `application/json`) withHeader `Content-Type` -> `application/json`
 
     def send[F: JsonWriter](payload: F) = {
 
-      implicit val ec = client.ec
-
       val content = implicitly[JsonWriter[F]].write(payload).compactPrint
 
-      val verb = if (method == "POST") BasicHTTP POST address else BasicHTTP PUT address
-
-      verb withHeaders this.headers
-      verb withHeader `Content-Type` -> `application/json` withHeader `Accept` -> `application/json`
-      verb send content map asSpray[T]
+      client connect BasicRequest(method, address, headers, params, Some(content)) flatMap (Future successful asSpray[T](_))
     }
   }
 

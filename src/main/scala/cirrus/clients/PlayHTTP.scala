@@ -4,6 +4,8 @@ import cirrus.internal.{BasicRequest, BasicClient, HTTPVerb, Response}
 import cirrus.{`Accept`, `Content-Type`, `application/json`}
 import play.api.libs.json.{Json, Reads, Writes}
 
+import scala.concurrent.Future
+
 object PlayHTTP {
 
   case class GET[T](address: String)(implicit val reads: Reads[T], val client: BasicClient) extends EmptyVerb[T]
@@ -17,36 +19,33 @@ object PlayHTTP {
 
   trait EmptyVerb[T] extends HTTPVerb {
 
-    implicit val reads: Reads[T]
-
     implicit val ec = client.ec
 
-    def send = {
+    implicit val reads: Reads[T]
 
-      withHeader(`Accept` -> `application/json`)
+    override type VerbClient = BasicClient
 
-      client
-        .connect(BasicRequest(method, address, headers, params))
-        .map(asPlay[T])
-    }
+    withHeader (`Accept` -> `application/json`)
+
+    def send = client connect BasicRequest(method, address, headers, params) flatMap (Future successful asPlay[T](_))
   }
 
 
   trait LoadedVerb[T] extends HTTPVerb {
 
+    implicit val ec = client.ec
+
     implicit val reads: Reads[T]
 
-    implicit val ec = client.ec
+    override type VerbClient = BasicClient
+
+    withHeader (`Accept` -> `application/json`) withHeader `Content-Type` -> `application/json`
 
     def send[F: Writes](payload: F) = {
 
-      withHeader(`Accept` -> `application/json`) withHeader `Content-Type` -> `application/json`
+      val content = Json stringify (implicitly[Writes[F]] writes payload)
 
-      val content = Json stringify implicitly[Writes[F]].writes(payload)
-
-      client
-        .connect(BasicRequest(method, address, headers, params, Some(content)))
-        .map(asPlay[T])
+      client connect BasicRequest(method, address, headers, params, Some(content)) flatMap (Future successful asPlay[T](_))
     }
   }
 
