@@ -1,8 +1,10 @@
 import argonaut.{DecodeJson, EncodeJson}
 import cirrus.clients.{ArgonautHTTP, BasicHTTP, PlayHTTP, SprayHTTP}
-import cirrus.internal.BasicClient
-import play.api.libs.json.{Reads, Writes}
-import spray.json.{JsonReader, JsonWriter}
+import cirrus.internal.{FailedRequest, BasicClient}
+import play.api.libs.json._
+import spray.json.{DeserializationException, JsonReader, JsonWriter}
+
+import scala.concurrent.{ExecutionContext => EC, Future}
 
 package object cirrus {
 
@@ -23,18 +25,67 @@ package object cirrus {
 
   object Cirrus {
 
-    def apply(v: BasicHTTP.VoidVerb) = v.send.map(_.body)(v.client.ec)
-    def apply(v: BasicHTTP.EmptyVerb) = v.send.map(_.body)(v.client.ec)
-    def apply(r: BasicPreppedRequest) = r.verb.send(r.payload).map(_.body)(r.verb.client.ec)
+    def apply(v: BasicHTTP.VoidVerb) = {
+      implicit val ec = v.client.ec
+      v.send map (_.body)
+    }
+    
+    def apply(v: BasicHTTP.EmptyVerb) = {
+      implicit val ec = v.client.ec
+      v.send map (_.body)
+    }
+    
+    def apply(r: BasicPreppedRequest) = {
+      implicit val ec = r.verb.client.ec
+      r.verb send r.payload map (_.body)
+    }
 
-    def apply[T: JsonReader](v: SprayHTTP.EmptyVerb[T]) = v.send.map(_.body)(v.client.ec)
-    def apply[T: JsonReader, F: JsonWriter](r: SprayPreppedRequest[T, F]) = r.verb.send(r.payload).map(_.body)(r.verb.client.ec)
 
-    def apply[T: DecodeJson](v: ArgonautHTTP.EmptyVerb[T]) = v.send.map(_.body)(v.client.ec)
-    def apply[T: DecodeJson, F: EncodeJson](r: ArgonautPreppedRequest[T, F]) = r.verb.send(r.payload).map(_.body)(r.verb.client.ec)
+    def apply[T: JsonReader](v: SprayHTTP.EmptyVerb[T]) = {
+      implicit val ec = v.client.ec
+      v.send map (_.body) flatMap sprayHandler
+    }
 
-    def apply[T: Reads](v: PlayHTTP.EmptyVerb[T]) = v.send.map(_.body)(v.client.ec)
-    def apply[T: Reads, F: Writes](r: PlayPreppedRequest[T, F]) = r.verb.send(r.payload).map(_.body)(r.verb.client.ec)
+    def apply[T: JsonReader, F: JsonWriter](r: SprayPreppedRequest[T, F]) = {
+      implicit val ec = r.verb.client.ec
+      r.verb send r.payload map (_.body) flatMap sprayHandler
+    }
+
+
+    def apply[T: DecodeJson](v: ArgonautHTTP.EmptyVerb[T]) = {
+      implicit val ec = v.client.ec
+      v.send map (_.body.get) flatMap argonautHandler
+    }
+
+    def apply[T: DecodeJson, F: EncodeJson](r: ArgonautPreppedRequest[T, F]) = {
+      implicit val ec = r.verb.client.ec
+      r.verb send r.payload map (_.body.get) flatMap argonautHandler
+    }
+
+
+    def apply[T: Reads](v: PlayHTTP.EmptyVerb[T]) = {
+      implicit val ec = v.client.ec
+      v.send map (_.body) flatMap playHandler
+    }
+
+    def apply[T: Reads, F: Writes](r: PlayPreppedRequest[T, F]) = {
+      implicit val ec = r.verb.client.ec
+      r.verb send r.payload map (_.body) flatMap playHandler
+    }
+
+
+    private def sprayHandler[T]: PartialFunction[Throwable, Future[T]] = {
+      case e: DeserializationException => Future.failed[T](FailedRequest(e))
+    }
+
+    private def argonautHandler[T]: PartialFunction[Throwable, Future[T]] = {
+      case e: NoSuchElementException => Future.failed[T](FailedRequest(e))
+    }
+
+    private def playHandler[T]: PartialFunction[JsResult[T], Future[T]] = {
+      case JsError(errors) => Future.failed[T](FailedRequest(new RuntimeException("Play deserialisation failed")))
+      case JsSuccess(v, p) => Future.successful(v)
+    }
   }
 
 

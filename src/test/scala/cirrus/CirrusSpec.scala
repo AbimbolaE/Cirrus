@@ -182,7 +182,7 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
             .withStatus(201)
             .withBody(abim.toJson.compactPrint)))
 
-    Cirrus(ArgonautHTTP.GET[User]("http://localhost:8080/argonaut/tests")) must be_==(Some(abim)).await
+    Cirrus(ArgonautHTTP.GET[User]("http://localhost:8080/argonaut/tests")) must be_==(abim).await
   }
 
 
@@ -197,7 +197,7 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
             .withStatus(201)
             .withBody(abim.toJson.compactPrint)))
 
-    Cirrus(ArgonautHTTP.PUT[User]("http://localhost:8080/argonaut/tests") ! abim) must be_==(Some(abim)).await
+    Cirrus(ArgonautHTTP.PUT[User]("http://localhost:8080/argonaut/tests") ! abim) must be_==(abim).await
   }
 
 
@@ -212,7 +212,7 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
             .withStatus(201)
             .withBody(abim.toJson.compactPrint)))
 
-    Cirrus(ArgonautHTTP.POST[User]("http://localhost:8080/argonaut/tests") ! abim) must be_==(Some(abim)).await
+    Cirrus(ArgonautHTTP.POST[User]("http://localhost:8080/argonaut/tests") ! abim) must be_==(abim).await
   }
 
 
@@ -226,7 +226,7 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
             .withStatus(201)
             .withBody(abim.toJson.compactPrint)))
 
-    Cirrus(ArgonautHTTP.DELETE[User]("http://localhost:8080/argonaut/tests")) must be_==(Some(abim)).await
+    Cirrus(ArgonautHTTP.DELETE[User]("http://localhost:8080/argonaut/tests")) must be_==(abim).await
   }
 
 
@@ -240,7 +240,7 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
             .withStatus(201)
             .withBody(stringify(userPlayFormat.writes(abim)))))
 
-    Cirrus(PlayHTTP.GET[User]("http://localhost:8080/play/tests")) must be_==(JsSuccess(abim)).await
+    Cirrus(PlayHTTP.GET[User]("http://localhost:8080/play/tests")) must be_==(abim).await
   }
 
 
@@ -255,7 +255,7 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
             .withStatus(201)
             .withBody(stringify(userPlayFormat.writes(abim)))))
 
-    Cirrus(PlayHTTP.PUT[User]("http://localhost:8080/play/tests") ! abim) must be_==(JsSuccess(abim)).await
+    Cirrus(PlayHTTP.PUT[User]("http://localhost:8080/play/tests") ! abim) must be_==(abim).await
   }
 
 
@@ -270,7 +270,7 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
             .withStatus(201)
             .withBody(stringify(userPlayFormat.writes(abim)))))
 
-    Cirrus(PlayHTTP.POST[User]("http://localhost:8080/play/tests") ! abim) must be_==(JsSuccess(abim)).await
+    Cirrus(PlayHTTP.POST[User]("http://localhost:8080/play/tests") ! abim) must be_==(abim).await
   }
 
 
@@ -284,6 +284,6 @@ class CirrusSpec extends Specification with WireMockContext with ExecutionEnviro
             .withStatus(201)
             .withBody(stringify(userPlayFormat.writes(abim)))))
 
-    Cirrus(PlayHTTP.DELETE[User]("http://localhost:8080/play/tests")) must be_==(JsSuccess(abim)).await
+    Cirrus(PlayHTTP.DELETE[User]("http://localhost:8080/play/tests")) must be_==(abim).await
   }
 }
