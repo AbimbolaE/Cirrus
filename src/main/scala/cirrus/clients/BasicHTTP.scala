@@ -15,7 +15,7 @@ object BasicHTTP {
 
   case class PUT(address: String)(implicit val client: BasicClient) extends LoadedVerb
 
-  case class POST(address: String)(implicit val client: BasicClient) extends LoadedVerb
+  case class POST(address: String)(implicit val client: BasicClient) extends LoadedVerb with LoadedFormVerb
 
   case class DELETE(address: String)(implicit val client: BasicClient) extends EmptyVerb
 
@@ -43,8 +43,14 @@ object BasicHTTP {
     override type VerbClient = BasicClient
 
     def send(payload: String) = client connect BasicRequest(method, address, headers, params, Some(payload))
+  }
 
-    def send(form: Map[String, String]): Future[BasicResponse] = {
+
+  trait LoadedFormVerb { self: HTTPVerb =>
+
+    override type VerbClient = BasicClient
+
+    def send(form: Map[String, String]) = {
 
       if (!headers.exists(_._1 == `Content-Type`)) withHeader(`Content-Type` -> `application/x-www-form-urlencoded`)
 
@@ -52,7 +58,7 @@ object BasicHTTP {
 
       val encodedPayload = form map (e => (encode(e._1), encode(e._2))) map (e => e._1 + "=" + e._2) mkString "&"
 
-      send(encodedPayload)
+      client connect BasicRequest(method, address, headers, params, Some(encodedPayload))
     }
   }
 

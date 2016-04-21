@@ -43,23 +43,23 @@ package object cirrus {
 
     def apply[T: JsonReader](v: SprayHTTP.EmptyVerb[T]) = {
       implicit val ec = v.client.ec
-      v.send map (_.body) flatMap sprayHandler
+      v.send map (_.body) recoverWith sprayHandler
     }
 
     def apply[T: JsonReader, F: JsonWriter](r: SprayPreppedRequest[T, F]) = {
       implicit val ec = r.verb.client.ec
-      r.verb send r.payload map (_.body) flatMap sprayHandler
+      r.verb send r.payload map (_.body) recoverWith sprayHandler
     }
 
 
     def apply[T: DecodeJson](v: ArgonautHTTP.EmptyVerb[T]) = {
       implicit val ec = v.client.ec
-      v.send map (_.body.get) flatMap argonautHandler
+      v.send map (_.body.get) recoverWith argonautHandler
     }
 
     def apply[T: DecodeJson, F: EncodeJson](r: ArgonautPreppedRequest[T, F]) = {
       implicit val ec = r.verb.client.ec
-      r.verb send r.payload map (_.body.get) flatMap argonautHandler
+      r.verb send r.payload map (_.body.get) recoverWith argonautHandler
     }
 
 
