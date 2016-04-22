@@ -89,13 +89,13 @@ package object cirrus {
   }
 
 
-  case class BasicPreppedRequest(verb: BasicHTTP.LoadedVerb, payload: String)
+  private[cirrus] case class BasicPreppedRequest(verb: BasicHTTP.LoadedVerb, payload: String)
 
-  case class SprayPreppedRequest[T, F](verb: SprayHTTP.LoadedVerb[T], payload: F)
+  private[cirrus] case class SprayPreppedRequest[T, F](verb: SprayHTTP.LoadedVerb[T], payload: F)
 
-  case class ArgonautPreppedRequest[T, F](verb: ArgonautHTTP.LoadedVerb[T], payload: F)
+  private[cirrus] case class ArgonautPreppedRequest[T, F](verb: ArgonautHTTP.LoadedVerb[T], payload: F)
 
-  case class PlayPreppedRequest[T, F](verb: PlayHTTP.LoadedVerb[T], payload: F)
+  private[cirrus] case class PlayPreppedRequest[T, F](verb: PlayHTTP.LoadedVerb[T], payload: F)
 
 
   implicit class ColdBasicRequest(verb: BasicHTTP.LoadedVerb) {

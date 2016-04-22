@@ -47,24 +47,28 @@ trait HeaderManipulation {
 
   protected val requestHeaders = ListBuffer.empty[(String, String)]
 
-  protected def headers = requestHeaders.toList
+  def headers = requestHeaders.toList
 
   def ~(entry: (String, String)): this.type = withHeader(entry)
   def ~~(entries: TraversableOnce[(String, String)]): this.type = withHeaders(entries)
 
   def withHeader(entry: (String, String)): this.type = { requestHeaders += entry; this }
   def withHeaders(entries: TraversableOnce[(String, String)]): this.type = { requestHeaders ++= entries; this }
+
+  def dropHeaders = requestHeaders.clear()
 }
 
 trait ParamManipulation {
 
   protected val requestParams = ListBuffer.empty[(String, String)]
 
-  protected def params = requestParams.toList
+  def params = requestParams.toList
 
   def ?(entry: (String, String)): this.type = withParam(entry)
   def ??(entries: TraversableOnce[(String, String)]): this.type = withParams(entries)
 
   def withParam(entry: (String, String)): this.type = { requestParams += entry; this }
   def withParams(entries: TraversableOnce[(String, String)]): this.type = { requestParams ++= entries; this }
+
+  def dropParams = requestParams.clear()
 }
