@@ -2,7 +2,7 @@
 Cirrus is a lightweight scala library which provides a http client for making http requests and consuming REST APIs
 
 ### Prologue
-In quiet a few scala projects I've worked, I've needed a HTTP client for interacting with REST APIs. In the scala community there are only a handful of HTTP clients which are available for interacting with Cloud-based APIs and among them are the HTTP clients provided by the Play and the Spray Frameworks and Dispatch but none come without their disadvantages.
+In quiet a few scala projects I've worked, I've needed a lightweight HTTP client for interacting with REST APIs. In the scala community there are only a handful of HTTP clients which are available for interacting with Cloud-based APIs and among them are the HTTP clients provided by the Play and the Spray Frameworks and Dispatch but none come without their disadvantages.
 
 The Play Framework provides the [Play-WS] Client library which comes with bits and pieces of the Play Stack, the Spray Framework provides the [Spray Client] which requires an instance of an implicit ActorSystem within scope and Dispatch provides cryptic hieroglyph DSL for making simple HTTP requests.
 
@@ -28,7 +28,7 @@ In an effort to make a simpler interface for making HTTP requests and consuming 
     - Play HTTP
 5. Advanced Usage
     - Working with Cirrus
-    - Making a custom Basic Client
+    - Making a Custom Basic Client
     - HTTPS requests
     - Proxies
     - For-Comprehensions
@@ -159,6 +159,20 @@ val asyncTask: Future[BasicResponse] = postRequest.send("foo=bar")
 ...
 ```
 
+These classes all require an instance of a Basic Client to be within implicit scope. The `cirrus` package object provides one by default however, you can pass your own instance by bringing it within block scope
+
+###### Example 3: A Basic HTTP POST request with a custom Basic client
+In this example a custom `BasicClient` is created and used in creating a `BasicHTTP.POST`.
+```
+implicit val client = BasicClient()
+
+val postRequest = BasicHTTP.POST("http://www.tiny-web.info/")
+  
+val asyncTask: Future[BasicResponse] = postRequest.send("foo=bar")
+
+...
+```
+
 ##### Passing HTTP Headers
 To add a single HTTP header to a HTTP request from the `BasicHTTP` object use the `withHeader` method.
 ```
@@ -247,6 +261,162 @@ val putRequest = BasicHTTP.PUT("http://www.tiny-web.info/")
 val putParams = List("fuche" -> "ball", "ist" -> "gut")
 
 putRequest.dropParams  // List()
+```
+
+##### Working with JSON
+Cirrus is designed to be a lightweight library with easy integration and as such, it proves support for working with JSON using the Spray, Play and Argonaut JSON AST libraries.
+
+##### Spray HTTP
+To use Cirrus with the Spray JSON library, simply use the case classes inside the `SprayHTTP` object instead of the `BasicHTTP` object. These classes all take a type parameter `T` and require an instance of a `JsonReader[T]` within implicit scope to deserialise the response body into the appropriate type.
+
+In the following examples, we will be assuming that a `Book` case class has been created along with a `JsonFormat[Book]` instance within impicit scope in it's companion object.
+```
+case class Book(id: Int, name: String, author: String)
+object Book {
+    implicit val format: JsonFormat[Book] = jsonFormat3(Book.apply)
+}
+```
+See https://github.com/spray/spray-json#providing-jsonformats-for-case-classes for more info.
+
+###### Example 1: A Spray HTTP GET request
+In this example a `SprayHTTP.GET` instance is created and the `send` method is used to produce a `Future[SprayResponse[T]]`. This example can also be applied to `SprayHTTP.DELETE`
+```
+import spray.json.DefaultJsonProtocol._
+import spray.json._
+
+val getRequest = SprayHTTP.GET[Book]("http://localhost:9000/book/1")
+
+val asyncTask: Future[SprayResponse[Book]] = getRequest.send
+
+...
+```
+
+###### Example 1: A Spray HTTP PUT request
+In this example a `SprayHTTP.PUT` instance is created and the `send` method is used to produce a `Future[SprayResponse[T]]`. This example can also be applied to `SprayHTTP.POST`
+```
+import spray.json.DefaultJsonProtocol._
+import spray.json._
+
+val bible = Book(1, "Bible", "Jesus Christ")
+
+val putRequest = SprayHTTP.PUT[Book]("http://localhost:9000/book/create")
+
+val asyncTask: Future[SprayResponse[Book]] = putRequest.send(bible)
+
+...
+```
+
+##### Play HTTP
+To use Cirrus with the Play JSON library, simply use the case classes inside the `PlayHTTP` object instead of the `BasicHTTP` object. These classes all take a type parameter `T` and require an instance of a `Reads[T]` within implicit scope to deserialise the response body into the appropriate type.
+
+In the following examples, we will be assuming that a `Book` case class has been created along with a `OFormat[Book]` instance within impicit scope in it's companion object.
+```
+case class Book(id: Int, name: String, author: String)
+object Book {
+    implicit val format: OFormat[Book] = play.api.libs.json.Json.format[Book]
+}
+```
+See https://www.playframework.com/documentation/2.6.x/ScalaJsonCombinators for more info.
+
+###### Example 1: A Play HTTP GET request
+In this example a `PlayHTTP.GET` instance is created and the `send` method is used to produce a `Future[PlayResponse[T]]`. This example can also be applied to `PlayHTTP.DELETE`
+```
+val getRequest = PlayHTTP.GET[Book]("http://localhost:9000/book/1")
+
+val asyncTask: Future[PlayResponse[Book]] = getRequest.send
+
+...
+```
+
+###### Example 1: A Play HTTP PUT request
+In this example a `PlayHTTP.PUT` instance is created and the `send` method is used to produce a `Future[PlayResponse[T]]`. This example can also be applied to `PlayHTTP.POST`
+```
+val bible = Book(1, "Bible", "Jesus Christ")
+
+val putRequest = PlayHTTP.PUT[Book]("http://localhost:9000/book/create")
+
+val asyncTask: Future[PlayResponse[Book]] = putRequest.send(bible)
+
+...
+```
+
+##### Argonaut HTTP
+To use Cirrus with the Argonaut JSON library, simply use the case classes inside the `ArgonautHTTP` object instead of the `BasicHTTP` object. These classes all take a type parameter `T` and require an instance of a `DecodeJson[T]` within implicit scope to deserialise the response body into the appropriate type.
+
+In the following examples, we will be assuming that a `Book` case class has been created along with a `CodecJson[Book]` instance within impicit scope in it's companion object.
+```
+import argonaut.Argonaut._
+import argonaut._
+
+case class Book(id: Int, name: String, author: String)
+object Book {
+    implicit val format: CodecJson[Book] = casecodec4(Book.apply, Book.unapply)("id", "name", "author")
+}
+```
+See http://argonaut.io/doc/codec/ for more info.
+
+###### Example 1: An Argonaut HTTP GET request
+In this example a `ArgonautHTTP.GET` instance is created and the `send` method is used to produce a `Future[ArgonautResponse[T]]`. This example can also be applied to `ArgonautHTTP.DELETE`
+```
+import argonaut.Argonaut._
+
+val getRequest = ArgonautHTTP.GET[Book]("http://localhost:9000/book/1")
+
+val asyncTask: Future[ArgonautResponse[Book]] = getRequest.send
+
+...
+```
+
+###### Example 1: An Argonaut HTTP PUT request
+In this example a `ArgonautHTTP.PUT` instance is created and the `send` method is used to produce a `Future[ArgonautResponse[T]]`. This example can also be applied to `ArgonautHTTP.POST`
+```
+import argonaut.Argonaut._
+
+val bible = Book(1, "Bible", "Jesus Christ")
+
+val putRequest = ArgonautHTTP.PUT[Book]("http://localhost:9000/book/create")
+
+val asyncTask: Future[ArgonautResponse[Book]] = putRequest.send(bible)
+
+...
+```
+
+#### Advanced Usage
+
+##### Working with Cirrus
+In Cirrus, it is possible to unwrap a Response and access it's body directly by using the `Cirrus` object. `GET`,`DELETE` and `HEAD` requests can simply be passed into its `apply` method to be invoked immediately, while `PUT` and `POST` requests require the use of the `!` method to send the request along with a payload.
+
+###### Example 1: An Argonaut HTTP GET request with Cirrus
+In this example a `ArgonautHTTP.GET` instance is created and the `apply` method of the `Cirrus` object is used to produce a `Future[ArgonautResponse[T]]`.
+```
+import argonaut.Argonaut._
+
+val bible: Book = Cirrus(ArgonautHTTP.GET[Book]("http://localhost:9000/book/1"))
+```
+
+###### Example 2: A Play HTTP PUT request with Cirrus
+In this example a `PlayHTTP.PUT` instance is created and the `apply` method of the `Cirrus` object is used to produce a `Future[PlayResponse[T]]`.
+```
+val bible = Book(1, "Bible", "Jesus Christ")
+
+val anotherBible = Cirrus(PlayHTTP.PUT[Book]("http://localhost:9000/book/create") ! bible)
+```
+
+##### Making a Custom Basic Client
+In Cirrus, it is possible to determine how the underlying `HTTPUrlConnection` instance will be configured. To do so requires creating a customised instance of the `BasicClient` class. The `cirrus` package object comes with a plain `BasicClient` instance in implicit scope which has been used in all the previous examples. The `BasicClient` class comes with a `Builder` case class which provides a fluent API for creating `BasicClient` instances.
+
+###### Example 1: Creating a Basic Client with a custom Execution Context
+In this example a Basic Client is created with a custom Execution Context
+```
+import java.util.concurrent.Executors
+import scala.concurrent.ExecutionContext
+
+implicit val executionContext = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
+
+val client: BasicClient = BasicClient
+      .Builder()
+      .withExecutionContext(executionContext)
+      .build()
 ```
 
 [Dispatch]: <http://dispatch.databinder.net/Dispatch.html>
