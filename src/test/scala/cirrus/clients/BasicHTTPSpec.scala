@@ -1,13 +1,13 @@
 package cirrus.clients
 
 import cirrus.clients.BasicHTTP._
-import utils.WireMockContext
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.specs2.Specification
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.ThrownExpectations
 import org.specs2.specification.ExecutionEnvironment
+import utils.WireMockContext
 
 import scala.concurrent.Await
 import scala.concurrent.duration._

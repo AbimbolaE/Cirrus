@@ -1,6 +1,6 @@
 package cirrus.clients
 
-import cirrus.internal.{BasicRequest, BasicClient, HTTPVerb, Response}
+import cirrus.internal._
 import cirrus.{`Accept`, `Content-Type`, `application/json`}
 import play.api.libs.json.{Json, Reads, Writes}
 

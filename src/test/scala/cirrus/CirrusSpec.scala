@@ -1,17 +1,16 @@
 package cirrus
 
 import cirrus.clients.{ArgonautHTTP, BasicHTTP, PlayHTTP, SprayHTTP}
-import utils.User._
-import utils.{User, WireMockContext}
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.specs2.Specification
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.ThrownExpectations
 import org.specs2.specification.ExecutionEnvironment
-import play.api.libs.json.JsSuccess
 import play.api.libs.json.Json._
 import spray.json._
+import utils.User._
+import utils.{User, WireMockContext}
 
 class CirrusSpec extends Specification with WireMockContext with ExecutionEnvironment with ThrownExpectations {
   

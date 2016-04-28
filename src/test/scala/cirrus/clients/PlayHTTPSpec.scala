@@ -1,8 +1,6 @@
 package cirrus.clients
 
 import cirrus.clients.PlayHTTP.{DELETE, GET, POST, PUT}
-import utils.User._
-import utils.{User, WireMockContext}
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.specs2.Specification
@@ -11,6 +9,8 @@ import org.specs2.matcher.ThrownExpectations
 import org.specs2.specification.ExecutionEnvironment
 import play.api.libs.json.JsSuccess
 import play.api.libs.json.Json._
+import utils.User._
+import utils.{User, WireMockContext}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._

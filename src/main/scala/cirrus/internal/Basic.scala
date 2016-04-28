@@ -6,6 +6,8 @@ import java.nio.charset.CodingErrorAction
 
 import cirrus.clients.BasicHTTP.BasicResponse
 import cirrus.internal.ClientConfig._
+import play.api.data.validation.ValidationError
+import play.api.libs.json.JsPath
 
 import scala.collection.JavaConverters.{iterableAsScalaIterableConverter, mapAsScalaMapConverter}
 import scala.concurrent.{ExecutionContext, Future, Promise}
@@ -115,6 +117,16 @@ case class BasicRequest(method: String, address: String, headers: List[(String, 
                         params: List[(String, String)], body: Option[String] = None) extends Request
 
 case class FailedRequest(cause: Throwable) extends IOException(cause)
+object FailedRequest {
+  def apply(message: String): FailedRequest = FailedRequest(new IOException(message))
+
+  def apply(errors: Seq[(JsPath, Seq[ValidationError])]): FailedRequest =
+    errors
+      .map(e => (e._1.toJsonString, e._2.head.message))
+      .map(e => e._1 + " has error " + e._2)
+      .map(m => FailedRequest(m))
+      .head
+}
 
 object ClientConfig {
 

@@ -1,6 +1,6 @@
 package cirrus.clients
 
-import cirrus.internal.{BasicRequest, BasicClient, HTTPVerb, Response}
+import cirrus.internal.{BasicClient, BasicRequest, HTTPVerb, Response}
 import cirrus.{`Accept`, `Content-Type`, `application/json`}
 import spray.json._
 

@@ -1,10 +1,10 @@
 import argonaut.{DecodeJson, EncodeJson}
 import cirrus.clients.{ArgonautHTTP, BasicHTTP, PlayHTTP, SprayHTTP}
-import cirrus.internal.{FailedRequest, BasicClient}
+import cirrus.internal.{BasicClient, FailedRequest}
 import play.api.libs.json._
 import spray.json.{DeserializationException, JsonReader, JsonWriter}
 
-import scala.concurrent.{ExecutionContext => EC, Future}
+import scala.concurrent.Future
 
 package object cirrus {
 
@@ -83,7 +83,7 @@ package object cirrus {
     }
 
     private def playHandler[T]: PartialFunction[JsResult[T], Future[T]] = {
-      case JsError(errors) => Future.failed[T](FailedRequest(new RuntimeException("Play deserialisation failed")))
+      case JsError(errors) => Future.failed[T](FailedRequest(errors))
       case JsSuccess(v, p) => Future.successful(v)
     }
   }
