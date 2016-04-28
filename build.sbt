@@ -1,6 +1,6 @@
 name := "cirrus"
 
-version := "1.4.1-SNAPSHOT"
+version := "1.4.1"
 
 organization := "com.github.godis"
 
