@@ -8,6 +8,23 @@ The Play Framework provides the [Play-WS] Client library which comes with bits a
 
 In an effort to make a simpler interface for making HTTP requests and consuming REST APIs which expose data in JSON format I created Cirrus. It provides the building blocks of HTTP Requests, Responses and Clients and then implements most of the common use cases with simple Scala case classes. Cirrus has no external dependencies on Third-party libraries and simply uses the HTTPURLConnection class (which comes as part of the Java JDK) for making HTTP requests.
 
+### Installation
+Cirrus is available in Maven Central under the group id of "com.github.godis".
+
+* Maven
+```
+<dependency>
+    <groupId>com.github.godis</groupId>
+    <artifactId>cirrus_2.11</artifactId>
+    <version>1.4.1</version>
+</dependency>
+```
+
+* SBT
+```
+libraryDependencies += "com.github.godis" % "cirrus_2.11" % "1.4.1"
+```
+
 ### Contents
 1. Architecture
     - Requests, Responses and Clients
@@ -424,4 +441,4 @@ val client: BasicClient = BasicClient
 [Spray Client]: <http://spray.io/documentation/1.2.3/spray-client/>
 [W3C-HEAD]: <https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.4>
 [scala-future]: <http://docs.scala-lang.org/overviews/core/futures.html>
-
+[Maven Central]: <http://search.maven.org/>
