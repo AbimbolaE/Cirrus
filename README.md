@@ -428,7 +428,7 @@ In this example a Basic Client is created with a custom Execution Context
 import java.util.concurrent.Executors
 import scala.concurrent.ExecutionContext
 
-implicit val executionContext = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
+val executionContext = ExecutionContext.fromExecutor(Executors.newSingleThreadExecutor())
 
 val client: BasicClient = BasicClient
       .Builder()
