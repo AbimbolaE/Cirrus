@@ -6,7 +6,7 @@ In quiet a few scala projects I've worked, I've needed a lightweight HTTP client
 
 The Play Framework provides the [Play-WS] Client library which comes with bits and pieces of the Play Stack, the Spray Framework provides the [Spray Client] which requires an instance of an implicit ActorSystem within scope and [Dispatch] provides cryptic hieroglyph DSL for making simple HTTP requests.
 
-In an effort to make a simpler interface for making HTTP requests and consuming REST APIs which expose data in JSON format I created Cirrus. It provides the building blocks of HTTP Requests, Responses and Clients and then implements most of the common use cases with simple Scala case classes. Cirrus has no external dependencies on Third-party libraries and simply uses the HTTPURLConnection class (which comes as part of the Java JDK) for making HTTP requests.
+In an effort to make a simpler interface for making HTTP requests and consuming REST APIs which expose data in JSON format I created Cirrus. It provides the building blocks of HTTP Requests, Responses and Clients and then implements most of the common use cases with simple Scala case classes. Cirrus has no external dependencies on Third-party libraries and simply uses the HTTPURLConnection class (which comes as part of the Java JDK) for making HTTP requests. As a result, it is extremely lightweight (~221 KB jar) as comes with none of it's third party dependencies.
 
 ### Installation
 Cirrus is available in Maven Central under the group id of "com.github.godis".
