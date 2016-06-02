@@ -2,7 +2,7 @@
 Cirrus is a lightweight scala library which provides a http client for making http requests and consuming REST APIs
 
 ### Prologue
-~~In quiet a few scala projects I've worked, I've needed a lightweight HTTP client for interacting with REST APIs. In the scala community there are only a handful of HTTP clients which are available for interacting with Cloud-based APIs and among them are the HTTP clients provided by the Play and the Spray Frameworks and Dispatch but none come without their disadvantages.~~
+~~In quite a few scala projects I've worked, I've needed a lightweight HTTP client for interacting with REST APIs. In the scala community there are only a handful of HTTP clients which are available for interacting with Cloud-based APIs and among them are the HTTP clients provided by the Play and the Spray Frameworks and Dispatch but none come without their disadvantages.~~
 
 ~~The Play Framework provides the [Play-WS] Client library which comes with bits and pieces of the Play Stack, the Spray Framework provides the [Spray Client] library which requires an instance of an implicit ActorSystem within scope and [Dispatch] provides cryptic hieroglyph DSL for making simple HTTP requests.~~
 
@@ -10,7 +10,7 @@ Cirrus is a lightweight scala library which provides a http client for making ht
 
 ~~Cirrus has no external dependencies on Third-party libraries and simply uses the HTTPURLConnection class (which comes as part of the Java JDK) for making HTTP requests. As a result, it is extremely lightweight (~221 KB jar) as comes with none of it's third party dependencies.~~
 
-One weekend, I got bored and decided the create a simple and easy to use HTTP Client library in Scala....The End.
+One weekend, I got bored and decided to create a simple and easy to use HTTP Client library in Scala....The End.
 =]
 
 ### A Minimal Example
